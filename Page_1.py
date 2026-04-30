@@ -70,82 +70,79 @@ st.markdown(
 )
 st.markdown("<br>", unsafe_allow_html=True)
 
-with st.form("my form"):
+with st.form("page1_form"):
     # Input Study Time
-    study_time = st.number_input(
-        label="Input your study time",
+    study_hours = st.number_input(
+        label="How many hours do you study per day?",
         min_value=0.0,
-        max_value=15.0,
+        max_value=10.0,
         step=0.5,
-        value=6.0,
         format="%.1f",
-        help="Enter your average study hours per day over the past week. Include self-study, assignments, and reading materials.",
+        value=st.session_state.get("study_hours", 4.0),
+        help="Average study hours per day including assignments and self-study.",
     )
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Input Sleep Time
-    sleep_time = st.number_input(
-        label="Input your sleep time",
+    sleep_hours = st.number_input(
+        label="How long do you sleep per day?",
         min_value=0.0,
         max_value=12.0,
         step=0.5,
-        value=7.0,
         format="%.1f",
-        help="Your average hours of sleep per night. Naps count too.",
+        value=st.session_state.get("sleep_hours", 8.0),
+        help="Average hours of sleep per night. Naps count too.",
+    )
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Input Extracurricular Time
+    eca_hours = st.number_input(
+        label="How long do you spend your time in extracurricular activities per day?",
+        min_value=0.0,
+        max_value=8.0,
+        step=0.5,
+        format="%.1f",
+        value=st.session_state.get("eca_hours", 1.0),
+        help="Time spent on clubs, organizations, or extracurricular activities per day.",
     )
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Input Social/Free Time
-    social_free_time = st.number_input(
-        label="Input your social/free time",
+    social_hours = st.number_input(
+        label="How long do you socialize per day?",
         min_value=0.0,
         max_value=10.0,
         step=0.5,
-        value=3.0,
         format="%.1f",
-        help="Time spent on hanging out, hobbies, gaming, or any non-academic activities per day.",
+        value=st.session_state.get("social_hours", 5.0),
+        help="Time spent hanging out or socializing with friends or family per day.",
     )
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Input GPA
-    current_gpa = st.number_input(
-        label="Input your current GPA",
+    # Input Physical Time
+    physical_hours = st.number_input(
+        label="How long do you exercise per day?",
         min_value=0.0,
-        max_value=4.0,
-        value=2.5,
-        help="Your latest GPA or midterm grade on a 0.0 - 4.0 scale.",
+        max_value=8.0,
+        step=0.5,
+        format="%.1f",
+        value=st.session_state.get("physical_hours", 2.0),
+        help="Time spent on exercise, sports, or any physical activity per day.",
     )
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Input Study Environment
-    environment = st.selectbox(
-        "Your study environment",
-        ["Quiet", "Moderate", "Noisy"],
-        help="Quiet = library or silent room. Moderate = cafe or co-working space. Noisy = crowded dorm or loud area.",
-    )
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Input Coping Strategy
-    coping = st.selectbox(
-        "Your coping strategy",
-        ["Intellect/Coping Well", "Emotional/Stressed"],
-        help="Intellect = you stay calm and structured under pressure. Emotional = you tend to feel anxious or overwhelmed easily.",
-    )
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Analyze Button
+    # Next Button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         submitted = st.form_submit_button(
-            "Analyze!", type="primary", use_container_width=True
+            "Next", type="primary", use_container_width=True
         )
 
 if submitted:
-    st.session_state.study_time = study_time
-    st.session_state.sleep_time = sleep_time
-    st.session_state.social_free_time = social_free_time
-    st.session_state.current_gpa = current_gpa
-    st.session_state.environment = environment
-    st.session_state.coping = coping
+    st.session_state.study_hours = study_hours
+    st.session_state.sleep_hours = sleep_hours
+    st.session_state.eca_hours = eca_hours
+    st.session_state.social_hours = social_hours
+    st.session_state.physical_hours = physical_hours
 
-    st.switch_page("pages/result.py")
+    st.switch_page("pages/Page_2.py")

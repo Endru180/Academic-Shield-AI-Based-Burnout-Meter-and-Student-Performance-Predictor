@@ -2,6 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
 import joblib
+import os
 
 # ⬇ Ngeload tiga file .pkl dari folder models, terus langsung disimpen di cache biar tiap kali
 # user mencet tombol "Analyze!", ga perlu ngeload lagi dari disk, cukup dari memory makanya
@@ -9,14 +10,15 @@ import joblib
 @st.cache_resource # Ini yg jadi pemain utama urusan caching
 def load_models():
     try:
-        model_burnout = joblib.load("models/burnout_model.pkl") # Model pertama, namanya burnout_model, ngepredict skor burnoutnya
-        model_grade = joblib.load("models/grade_model.pkl") # Model kedua, namanya grade_model, ngepredict future GPA-nya
-        encoder = joblib.load("models/encoder.pkl") # Label Encoder buat input yang kategorical kayak lingkungan belajarnya ama strategi copingnya
-        return model_burnout, model_grade, encoder
-    except:
+        model_a       = joblib.load("models/modelA.pkl") # Model pertama, namanya burnout_model, ngepredict skor burnoutnya
+        model_b       = joblib.load("models/modelB.pkl") # Model kedua, namanya grade_model, ngepredict future GPA-nya
+        stress_mapping = joblib.load("models/stress_level_encoder_modelB.pkl") # Label Encoder buat input yang kategorical kayak stress levelnya
+        return model_a, model_b, stress_mapping
+    except Exception as e:
+        st.error(f"Failed to load models: {e}")
         return None, None, None
 
-model_burnout, model_grade, encoder = load_models() # Assign model_burnout yang direturn load_models ke variabel model_burnout. Sama juga buat yang duanya lagi (model_grade & encoder)
+model_a, model_b, stress_mapping = load_models() # Assign model_burnout yang direturn load_models ke variabel model_a. Sama juga buat yang duanya lagi (model_b & stress_mapping)
 
 st.markdown(
     """
@@ -67,18 +69,34 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-if "study_time" not in st.session_state:
-    st.warning("Please fill out the form first!")
-    if st.button("Back to Form"):
-        st.switch_page("app.py")
+# Checking jawabannya sebelum proses lebih jauh
+required_keys = [
+    "study_hours", "sleep_hours", "eca_hours", "social_hours", "physical_hours",
+    "stress_level_category", "exam_pressure", "family_expectation",
+    "financial_stress", "social_support", "anxiety_score", "depression_score",
+]
+
+if not all(key in st.session_state for key in required_keys):
+    st.warning("Please complete all the form first.")
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("Back to Page 1", use_container_width=True, type="secondary"):
+            st.switch_page("Page_1.py")
     st.stop()
 
-study_time = st.session_state.study_time
-sleep_time = st.session_state.sleep_time
-social_free_time = st.session_state.social_free_time
-current_gpa = st.session_state.current_gpa
-environment = st.session_state.environment
-coping = st.session_state.coping
+# Ngeload jawaban-jawaban sebelumnya ke variabel yang akan dipakai
+study_hours          = st.session_state.study_hours
+sleep_hours          = st.session_state.sleep_hours
+eca_hours            = st.session_state.eca_hours
+social_hours         = st.session_state.social_hours
+physical_hours       = st.session_state.physical_hours
+stress_level_category = st.session_state.stress_level_category
+exam_pressure        = st.session_state.exam_pressure
+family_expectation   = st.session_state.family_expectation
+financial_stress     = st.session_state.financial_stress
+social_support       = st.session_state.social_support
+anxiety_score        = st.session_state.anxiety_score
+depression_score     = st.session_state.depression_score
 
 st.markdown(
     """
@@ -88,25 +106,46 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-if encoder is not None:
-    input_data = pd.DataFrame([{
-        "study_time":       study_time,
-        "sleep_time":       sleep_time,
-        "social_free_time": social_free_time,
-        "current_gpa":      current_gpa,
-        "environment":      encoder.transform([environment])[0],
-        "coping":           encoder.transform([coping])[0],
-    }])
+# Mapping buat stress levelnya, assign value khusus untuk stress levelnya buat model_a
+stress_mapping_a = {"Low": 2.29, "Moderate": 4.80, "High": 7.42}
+stress_for_model_a = stress_mapping_a[stress_level_category]
+stress_for_model_b = stress_mapping[stress_level_category]
 
-# To Do 1: Replace this with Burnout Score model (model_burnout)
-burnout_score = round(
-    100 - (sleep_time * 4) - (social_free_time * 2) + (study_time * 2), 1
-)
-burnout_score = max(0, min(100, burnout_score))
+input_model_a = pd.DataFrame([{
+    "study_hours_per_day": study_hours,
+    "sleep_hours":         sleep_hours,
+    "exam_pressure":       exam_pressure,
+    "stress_level":        stress_for_model_a,
+    "financial_stress":    financial_stress,
+    "social_support":      social_support,
+    "anxiety_score":       anxiety_score,
+    "depression_score":    depression_score,
+    "family_expectation":  family_expectation,
+}])
 
-# To Do 2: Replace this with GPA Predictor model (model_grade)
-predicted_grade = current_gpa
+study_hours_for_b = study_hours if study_hours >= 5.0 else 7.48
 
+input_model_b = pd.DataFrame([{
+    "study_hours":    study_hours_for_b,
+    "eca_hours":      eca_hours,
+    "sleep_hours":    sleep_hours,
+    "social_hours":   social_hours,
+    "physical_hours": physical_hours,
+    "stress_level":   stress_for_model_b,
+}])
+
+# Mesin prediktor utamanya
+if model_a is not None and model_b is not None:
+    burnout_raw    = model_a.predict(input_model_a)[0]
+    burnout_score  = round(float(burnout_raw) * 10, 1)
+    burnout_score  = max(0.0, min(100.0, burnout_score))
+    predicted_gpa  = round(float(model_b.predict(input_model_b)[0]), 2)
+    predicted_gpa  = max(0.0, min(4.0, predicted_gpa))
+else:
+    st.error("Models failed to load. Please contact the administrator.")
+    st.stop()
+
+# Prediksi skor burnout saat ini
 if burnout_score >= 70:
     burnout_label = "BURNOUT."
     burnout_color = "#e74c3c"
@@ -157,11 +196,12 @@ fig.update_layout(
 
 st.plotly_chart(fig, use_container_width=True)
 
-if predicted_grade >= 3.5:
+# Prediksi GPA masa depan
+if predicted_gpa >= 3.5:
     gpa_label = "Excellent! Keep it up."
-elif predicted_grade >= 3.0:
+elif predicted_gpa >= 3.0:
     gpa_label = "Good job!"
-elif predicted_grade >= 2.5:
+elif predicted_gpa >= 2.5:
     gpa_label = "Not so great."
 else:
     gpa_label = "Needs improvement."
@@ -172,13 +212,14 @@ with col2:
         f"""
         <div style='text-align: center;'>
             <p style='font-size: 1.5rem; font-weight: 600;'>Your Predicted GPA</p>
-            <p style='font-size: 3.0rem; font-weight: 650; margin-top: -30px;'>{predicted_grade:.1f}/4.0</p>
+            <p style='font-size: 3.0rem; font-weight: 650; margin-top: -30px;'>{predicted_gpa:.2f}/4.0</p>
             <p style='font-size: 1.0rem; margin-top: -28px;'>(<i>{gpa_label}</i>)</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
+# Pesan insight yang dihasilkan tergantung skor burnout yang diprediksi
 if burnout_score >= 70:
     insight_text = "Your burnout level is high! Try increasing your sleep to at least 7 hours and reduce study time slightly."
 elif burnout_score >= 40:
@@ -203,6 +244,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Feedback Section
 st.subheader("Feedback")
 st.markdown(
     "<p style='color: white; margin-top: -13px; margin-bottom: 20px;'>Help us improve The Academic Shield!</p>",
@@ -228,22 +270,25 @@ if feedback_submitted:
         st.warning("Please give a star rating first!")
     else:
         # Simpan feedback ke CSV
-        feedback_data = pd.DataFrame(
-            [
-                {
-                    "study_time": study_time,
-                    "sleep_time": sleep_time,
-                    "social_free_time": social_free_time,
-                    "current_gpa": current_gpa,
-                    "environment": environment,
-                    "coping": coping,
-                    "burnout_score": burnout_score,
-                    "predicted_grade": predicted_grade,
-                    "rating": rating.count("⭐"),
-                    "comment": comment,
-                }
-            ]
-        )
+        os.makedirs("feedback", exist_ok=True) # Buat folder feedback kalau belum ada. Kalau sudah ada, skip
+        feedback_data = pd.DataFrame([{
+            "study_hours":          study_hours,
+            "sleep_hours":          sleep_hours,
+            "eca_hours":            eca_hours,
+            "social_hours":         social_hours,
+            "physical_hours":       physical_hours,
+            "stress_level":         stress_level_category,
+            "exam_pressure":        exam_pressure,
+            "family_expectation":   family_expectation,
+            "financial_stress":     financial_stress,
+            "social_support":       social_support,
+            "anxiety_score":        anxiety_score,
+            "depression_score":     depression_score,
+            "burnout_score":        burnout_score,
+            "predicted_gpa":        predicted_gpa,
+            "rating":               rating.count("⭐"),
+            "comment":              comment,
+        }])
 
         feedback_data.to_csv(
             "feedback/responses.csv",
@@ -257,4 +302,4 @@ if feedback_submitted:
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     if st.button("Back to Form", use_container_width=True):
-        st.switch_page("app.py")
+        st.switch_page("Page_1.py")
