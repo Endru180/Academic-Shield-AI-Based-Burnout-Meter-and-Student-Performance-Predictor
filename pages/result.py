@@ -1,5 +1,6 @@
 import streamlit as st
 import plotly.graph_objects as go
+from utils import render_nav
 import pandas as pd
 import joblib
 import os
@@ -25,14 +26,23 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     * { font-family: 'Inter', sans-serif !important; }
-    .stApp { background-color: #3d8ef0; }
+    .stApp {
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        min-height: 100vh;
+    }
     header { visibility: hidden; }
 
+    /* hide the rating number input */
+    .stNumberInput { display: none !important; }
+
     [data-testid="stForm"] {
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        background-color: transparent !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        padding: 2rem 2.5rem !important;
+        border-radius: 16px !important;
+        background: rgba(255, 255, 255, 0.07) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
     }
 
    [data-testid="stRadio"] > div {
@@ -48,26 +58,44 @@ st.markdown(
 
     [data-testid="stFormSubmitButton"] button {
         border-radius: 50px !important;
+        background: linear-gradient(90deg, #00b4d8, #0077b6) !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0, 180, 216, 0.35) !important;
     }
 
     [data-testid="stFormSubmitButton"] button p {
         font-weight: 700 !important;
         font-size: 1.1rem !important;
+        color: #ffffff !important;
     }
 
     .stButton > button {
         border-radius: 50px !important;
-        background-color: #000000 !important;
+        background: linear-gradient(90deg, #00b4d8, #0077b6) !important;
         border: none !important;
+        box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3) !important;
     }
     .stButton > button p {
         font-weight: 700 !important;
         color: white !important;
     }
+
+    [data-testid="stTextArea"] textarea {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px !important;
+    }
+
+    [data-testid="stTextArea"] textarea::placeholder {
+        color: rgba(255, 255, 255, 0.4) !important;
+    }
     </style>
 """,
     unsafe_allow_html=True,
 )
+
+render_nav()
 
 # Checking jawabannya sebelum proses lebih jauh
 required_keys = [
@@ -100,7 +128,7 @@ depression_score     = st.session_state.depression_score
 
 st.markdown(
     """
-    <h1 style='text-align: center; margin-top: -60px; margin-bottom: -55px;'>MEASURE YOUR BURNOUT</h1>
+    <h1 style='text-align: center; margin-top: -60px; margin-bottom: -40px;'>MEASURE YOUR BURNOUT</h1>
     <h1 style='text-align: center; margin-bottom: 20px;'>& PREDICT YOUR GRADE</h1>
     """,
     unsafe_allow_html=True,
@@ -196,6 +224,57 @@ fig.update_layout(
 
 st.plotly_chart(fig, use_container_width=True)
 
+# Radar chart — lifestyle balance
+stress_numeric = {"Low": 8.0, "Moderate": 5.0, "High": 2.0}[stress_level_category]
+
+radar_labels = ["Study", "Sleep", "Extracurricular", "Social", "Physical", "Low Stress"]
+radar_values = [
+    study_hours / 10.0 * 10,       # max 10
+    sleep_hours / 12.0 * 10,       # max 12
+    eca_hours / 8.0 * 10,          # max 8
+    social_hours / 10.0 * 10,      # max 10
+    physical_hours / 8.0 * 10,     # max 8
+    stress_numeric,                 # Low=8, Moderate=5, High=2
+]
+radar_labels_closed = radar_labels + [radar_labels[0]]
+radar_values_closed = radar_values + [radar_values[0]]
+
+radar_fig = go.Figure(
+    go.Scatterpolar(
+        r=radar_values_closed,
+        theta=radar_labels_closed,
+        fill="toself",
+        fillcolor="rgba(0, 180, 216, 0.2)",
+        line=dict(color="#00b4d8", width=2),
+    )
+)
+radar_fig.update_layout(
+    polar=dict(
+        bgcolor="rgba(255,255,255,0.05)",
+        radialaxis=dict(
+            visible=True,
+            range=[0, 10],
+            tickfont=dict(color="rgba(255,255,255,0.5)", size=10),
+            gridcolor="rgba(255,255,255,0.1)",
+            linecolor="rgba(255,255,255,0.1)",
+        ),
+        angularaxis=dict(
+            tickfont=dict(color="white", size=12),
+            gridcolor="rgba(255,255,255,0.1)",
+            linecolor="rgba(255,255,255,0.15)",
+        ),
+    ),
+    paper_bgcolor="rgba(0,0,0,0)",
+    title={
+        "text": "Lifestyle Balance",
+        "x": 0.5,
+        "xanchor": "center",
+        "font": {"size": 18, "color": "white"},
+    },
+    margin=dict(t=60, b=40, l=60, r=60),
+)
+st.plotly_chart(radar_fig, use_container_width=True)
+
 # Prediksi GPA masa depan
 if predicted_gpa >= 3.5:
     gpa_label = "Excellent! Keep it up."
@@ -252,11 +331,40 @@ st.markdown(
 )
 
 with st.form("feedback_form"):
-    rating = st.radio(
-        "Rate your experience",
-        options=["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"],
-        horizontal=True,
-    )
+    st.markdown("""
+    <style>
+    .star-row { display: flex; flex-direction: row-reverse; justify-content: center; gap: 6px; margin: 8px 0 20px 0; }
+    .star-row input[type="radio"] { display: none; }
+    .star-row label { font-size: 2.4rem; color: rgba(255,255,255,0.2); cursor: pointer; transition: color 0.1s ease; line-height: 1; }
+    .star-row label:hover,
+    .star-row label:hover ~ label { color: rgba(245,197,24,0.45); }
+    .star-row input:checked ~ label { color: #f5c518; }
+    </style>
+    <p style="color:rgba(255,255,255,0.8); font-size:1rem; font-weight:600; margin-bottom:4px;">Rate your experience</p>
+    <div class="star-row">
+      <input type="radio" id="sr5" name="star_rating" value="5"><label for="sr5">★</label>
+      <input type="radio" id="sr4" name="star_rating" value="4"><label for="sr4">★</label>
+      <input type="radio" id="sr3" name="star_rating" value="3"><label for="sr3">★</label>
+      <input type="radio" id="sr2" name="star_rating" value="2"><label for="sr2">★</label>
+      <input type="radio" id="sr1" name="star_rating" value="1"><label for="sr1">★</label>
+    </div>
+    <script>
+    document.querySelectorAll('.star-row input[type="radio"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            var val = parseInt(this.value);
+            var inp = document.querySelector('[data-testid="stNumberInput"] input');
+            if (inp) {
+                var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+                setter.call(inp, val);
+                inp.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+    });
+    </script>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="hide-next-widget"></div>', unsafe_allow_html=True)
+    rating = st.number_input("Rating", min_value=0, max_value=5, value=0, label_visibility="collapsed")
     comment = st.text_area("Any comments?", placeholder="Write your thoughts here...")
 
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -266,11 +374,11 @@ with st.form("feedback_form"):
         )
 
 if feedback_submitted:
-    if rating is None:
+    if rating == 0:
         st.warning("Please give a star rating first!")
     else:
         # Simpan feedback ke CSV
-        os.makedirs("feedback", exist_ok=True) # Buat folder feedback kalau belum ada. Kalau sudah ada, skip
+        os.makedirs("feedback", exist_ok=True)
         feedback_data = pd.DataFrame([{
             "study_hours":          study_hours,
             "sleep_hours":          sleep_hours,
@@ -286,7 +394,7 @@ if feedback_submitted:
             "depression_score":     depression_score,
             "burnout_score":        burnout_score,
             "predicted_gpa":        predicted_gpa,
-            "rating":               rating.count("⭐"),
+            "rating":               rating,
             "comment":              comment,
         }])
 

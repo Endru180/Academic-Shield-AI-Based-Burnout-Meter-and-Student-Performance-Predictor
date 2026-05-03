@@ -1,4 +1,5 @@
 import streamlit as st
+from utils import render_nav
 
 st.markdown(
     """
@@ -8,31 +9,52 @@ st.markdown(
     * {
         font-family: 'Inter', sans-serif !important;
     }
-            
+
     .stApp {
-        background-color: #3d8ef0;
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        min-height: 100vh;
     }
 
     /* Sembunyikan header bawaan Streamlit */
     header {visibility: hidden;}
 
     .stNumberInput input {
-        border-radius: 50px;
-        text-align: center;
-        font-size: 1.0rem;
-        font-weight: 600;
+        border-radius: 50px !important;
+        text-align: center !important;
+        font-size: 1.0rem !important;
+        font-weight: 600 !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .stNumberInput > div,
+    .stNumberInput [data-baseweb="input"] {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    [data-testid="stSelectbox"] > div > div {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px !important;
+        color: #ffffff !important;
     }
 
     label[data-testid="stWidgetLabel"] p {
         font-size: 1.1rem !important;
         font-weight: 400 !important;
     }
-            
+
     [data-testid="stForm"] {
-        border: none;
-        padding: 0;
-        box-shadow: none;
-        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        padding: 2rem 2.5rem !important;
+        border-radius: 16px !important;
+        background: rgba(255, 255, 255, 0.07) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
     }
 
     [data-testid="stFormSubmitButton"] {
@@ -43,39 +65,39 @@ st.markdown(
 
     [data-testid="stFormSubmitButton"] button {
         border-radius: 50px !important;
+        background: linear-gradient(90deg, #00b4d8, #0077b6) !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0, 180, 216, 0.35) !important;
     }
 
     [data-testid="stFormSubmitButton"] button p {
         font-weight: 700 !important;
         font-size: 1.1rem !important;
+        color: #ffffff !important;
     }
 
-    [data-testid="stBaseButton-secondary"] {
+    .stButton > button {
         border-radius: 50px !important;
-        background-color: rgba(0,0,0,0.5) !important;
+        background: linear-gradient(90deg, #00b4d8, #0077b6) !important;
         border: none !important;
-        width: 100% !important;
+        box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3) !important;
     }
 
-    [data-testid="stBaseButton-secondary"] p {
+    .stButton > button p {
         font-weight: 700 !important;
-        font-size: 1.1rem !important;
         color: white !important;
-    }
-
-    [data-testid="stBaseButton-secondary"]:hover {
-        background-color: rgba(0,0,0,0.7) !important;
-        transition: background-color 0.2s ease;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
+render_nav()
+
 # The Main Title
 st.markdown(
     """
-    <h1 style='text-align: center; margin-top: -60px; margin-bottom: -55px;'>MEASURE YOUR BURNOUT</h1>
+    <h1 style='text-align: center; margin-top: -60px; margin-bottom: -40px;'>MEASURE YOUR BURNOUT</h1>
     <h1 style='text-align: center; margin-bottom: 20px;'>& PREDICT YOUR GRADE</h1>
     """,
     unsafe_allow_html=True,
