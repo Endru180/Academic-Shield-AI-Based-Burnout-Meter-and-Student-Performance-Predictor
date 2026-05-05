@@ -5,6 +5,8 @@ import pandas as pd
 import joblib
 import os
 
+st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
+
 # ⬇ Ngeload tiga file .pkl dari folder models, terus langsung disimpen di cache biar tiap kali
 # user mencet tombol "Analyze!", ga perlu ngeload lagi dari disk, cukup dari memory makanya
 # latencynya bisa low
@@ -31,9 +33,6 @@ st.markdown(
         min-height: 100vh;
     }
     header { visibility: hidden; }
-
-    /* hide the rating number input */
-    .stNumberInput { display: none !important; }
 
     [data-testid="stForm"] {
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -331,40 +330,18 @@ st.markdown(
 )
 
 with st.form("feedback_form"):
-    st.markdown("""
-    <style>
-    .star-row { display: flex; flex-direction: row-reverse; justify-content: center; gap: 6px; margin: 8px 0 20px 0; }
-    .star-row input[type="radio"] { display: none; }
-    .star-row label { font-size: 2.4rem; color: rgba(255,255,255,0.2); cursor: pointer; transition: color 0.1s ease; line-height: 1; }
-    .star-row label:hover,
-    .star-row label:hover ~ label { color: rgba(245,197,24,0.45); }
-    .star-row input:checked ~ label { color: #f5c518; }
-    </style>
-    <p style="color:rgba(255,255,255,0.8); font-size:1rem; font-weight:600; margin-bottom:4px;">Rate your experience</p>
-    <div class="star-row">
-      <input type="radio" id="sr5" name="star_rating" value="5"><label for="sr5">★</label>
-      <input type="radio" id="sr4" name="star_rating" value="4"><label for="sr4">★</label>
-      <input type="radio" id="sr3" name="star_rating" value="3"><label for="sr3">★</label>
-      <input type="radio" id="sr2" name="star_rating" value="2"><label for="sr2">★</label>
-      <input type="radio" id="sr1" name="star_rating" value="1"><label for="sr1">★</label>
-    </div>
-    <script>
-    document.querySelectorAll('.star-row input[type="radio"]').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            var val = parseInt(this.value);
-            var inp = document.querySelector('[data-testid="stNumberInput"] input');
-            if (inp) {
-                var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-                setter.call(inp, val);
-                inp.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-        });
-    });
-    </script>
-    """, unsafe_allow_html=True)
-
-    st.markdown('<div class="hide-next-widget"></div>', unsafe_allow_html=True)
-    rating = st.number_input("Rating", min_value=0, max_value=5, value=0, label_visibility="collapsed")
+    st.markdown(
+        "<p style='color:rgba(255,255,255,0.8); font-size:1rem; font-weight:600; margin-bottom:4px;'>Rate your experience</p>",
+        unsafe_allow_html=True,
+    )
+    rating = st.radio(
+        "Rate your experience",
+        options=[1, 2, 3, 4, 5],
+        format_func=lambda x: "★" * x,
+        index=None,
+        horizontal=True,
+        label_visibility="collapsed",
+    )
     comment = st.text_area("Any comments?", placeholder="Write your thoughts here...")
 
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -374,8 +351,8 @@ with st.form("feedback_form"):
         )
 
 if feedback_submitted:
-    if rating == 0:
-        st.warning("Please give a star rating first!")
+    if rating is None:
+        st.error("Please select a star rating before submitting.")
     else:
         # Simpan feedback ke CSV
         os.makedirs("feedback", exist_ok=True)

@@ -1,6 +1,8 @@
 import streamlit as st
 from utils import render_nav
 
+st.set_page_config(initial_sidebar_state="collapsed")
+
 st.markdown(
     """
     <style>
