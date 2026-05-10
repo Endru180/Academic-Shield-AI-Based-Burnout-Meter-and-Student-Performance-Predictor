@@ -211,3 +211,4 @@ marimo/_lsp/
 __marimo__/datasets/ 
 feedback/*.csv 
 .DS_Store 
+"datasets/academic_stress_level.csv" 
