@@ -1,7 +1,7 @@
 import streamlit as st
 from utils import render_nav
 
-st.set_page_config(initial_sidebar_state="collapsed")
+st.set_page_config(layout="centered", initial_sidebar_state="collapsed")
 
 st.markdown(
     """
@@ -17,22 +17,48 @@ st.markdown(
         min-height: 100vh;
     }
 
-    /* Sembunyikan header bawaan Streamlit */
     header {visibility: hidden;}
 
-    .stNumberInput input {
+    /* Wrapper jadi satu pill utuh */
+    .stNumberInput [data-baseweb="input"] {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 50px !important;
+        overflow: hidden !important;
+        gap: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+
+    /* Input field transparan, ikut background wrapper */
+    .stNumberInput input {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
         text-align: center !important;
         font-size: 1.0rem !important;
         font-weight: 600 !important;
-        background-color: rgba(255, 255, 255, 0.08) !important;
         color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
 
-    .stNumberInput > div,
-    .stNumberInput [data-baseweb="input"] {
-        background-color: transparent !important;
+    /* Tombol transparan, ikut background wrapper */
+    .stNumberInput button {
+        background: transparent !important;
+        border: none !important;
+        color: #ffffff !important;
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+    }
+
+    .stNumberInput button:hover {
+        background: transparent !important;
+        color: #00b4d8 !important;
+        filter: drop-shadow(0 0 2px rgba(0, 180, 216, 0.8)) drop-shadow(0 0 5px rgba(0, 180, 216, 0.6)) drop-shadow(0 0 8px rgba(0, 180, 216, 0.4)) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stNumberInput > div {
+        background: transparent !important;
         border: none !important;
         box-shadow: none !important;
     }
@@ -69,6 +95,12 @@ st.markdown(
         font-weight: 700 !important;
         font-size: 1.1rem !important;
         color: #ffffff !important;
+    }
+
+    [data-testid="stTooltipIcon"]:hover {
+        filter: drop-shadow(0 0 1px rgba(0, 180, 216, 0.8)) drop-shadow(0 0 4px rgba(0, 180, 216, 0.6)) drop-shadow(0 0 7px rgba(0, 180, 216, 0.4)) !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
     }
     </style>
     """,

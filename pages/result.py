@@ -5,7 +5,7 @@ import pandas as pd
 import joblib
 import os
 
-st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(layout="centered", initial_sidebar_state="collapsed")
 
 # ⬇ Ngeload tiga file .pkl dari folder models, terus langsung disimpen di cache biar tiap kali
 # user mencet tombol "Analyze!", ga perlu ngeload lagi dari disk, cukup dari memory makanya
@@ -88,6 +88,16 @@ st.markdown(
 
     [data-testid="stTextArea"] textarea::placeholder {
         color: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    [data-testid="stButton"][key="back_btn"] button,
+        div:has(> [data-testid="stBaseButton-secondary"]) button {
+        border-radius: 50px !important;
+        background: transparent !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        color: white !important;
+        box-shadow: none !important;
+        margin-top: 50px;
     }
     </style>
 """,
@@ -221,14 +231,14 @@ fig.update_layout(
     ],
 )
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
 # Radar chart — lifestyle balance
 stress_numeric = {"Low": 8.0, "Moderate": 5.0, "High": 2.0}[stress_level_category]
 
 radar_labels = ["Study", "Sleep", "Extracurricular", "Social", "Physical", "Low Stress"]
 radar_values = [
-    study_hours / 10.0 * 10,       # max 10
+    study_hours,       # max 10
     sleep_hours / 12.0 * 10,       # max 12
     eca_hours / 8.0 * 10,          # max 8
     social_hours / 10.0 * 10,      # max 10
@@ -245,8 +255,19 @@ radar_fig = go.Figure(
         fill="toself",
         fillcolor="rgba(0, 180, 216, 0.2)",
         line=dict(color="#00b4d8", width=2),
+        customdata=[
+            f"{study_hours} hrs/day",
+            f"{sleep_hours} hrs/day",
+            f"{eca_hours} hrs/day",
+            f"{social_hours} hrs/day",
+            f"{physical_hours} hrs/day",
+            stress_level_category,
+            f"{study_hours} hrs/day",  # penutup loop
+        ],
+        hovertemplate="<b>%{theta}</b><br>%{customdata}<extra></extra>",
     )
 )
+
 radar_fig.update_layout(
     polar=dict(
         bgcolor="rgba(255,255,255,0.05)",
@@ -267,12 +288,13 @@ radar_fig.update_layout(
     title={
         "text": "Lifestyle Balance",
         "x": 0.5,
+        "y": 0.94,
         "xanchor": "center",
-        "font": {"size": 18, "color": "white"},
+        "font": {"size": 21, "color": "white"},
     },
-    margin=dict(t=60, b=40, l=60, r=60),
+    margin=dict(t=95, b=0, l=60, r=60),
 )
-st.plotly_chart(radar_fig, use_container_width=True)
+st.plotly_chart(radar_fig, use_container_width=True, config={"displayModeBar": False})
 
 # Prediksi GPA masa depan
 if predicted_gpa >= 3.5:
@@ -289,7 +311,7 @@ with col2:
     st.markdown(
         f"""
         <div style='text-align: center;'>
-            <p style='font-size: 1.5rem; font-weight: 600;'>Your Predicted GPA</p>
+            <p style='font-size: 1.5rem; font-weight: 600; margin-top: 65px;'>Your Predicted GPA</p>
             <p style='font-size: 3.0rem; font-weight: 650; margin-top: -30px;'>{predicted_gpa:.2f}/4.0</p>
             <p style='font-size: 1.0rem; margin-top: -28px;'>(<i>{gpa_label}</i>)</p>
         </div>
@@ -313,8 +335,8 @@ st.markdown(
         color: #000000;
         border: 1px solid #000000;
         border-left: 5px solid #000000;
-        margin-top: 60px;
-        margin-bottom: 70px;
+        margin-top: 65px;
+        margin-bottom: 65px;
     '>
         <span style='font-weight: 700;'>Insight Message:</span> {insight_text}
     </div>
@@ -386,5 +408,5 @@ if feedback_submitted:
 
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    if st.button("Back to Form", use_container_width=True):
+    if st.button("Back to Form", use_container_width=True, key="back_btn"):
         st.switch_page("Page_1.py")

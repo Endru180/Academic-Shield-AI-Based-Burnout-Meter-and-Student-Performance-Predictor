@@ -1,7 +1,7 @@
 import streamlit as st
 from utils import render_nav
 
-st.set_page_config(initial_sidebar_state="collapsed")
+st.set_page_config(layout="centered", initial_sidebar_state="collapsed")
 
 st.markdown(
     """
@@ -17,26 +17,51 @@ st.markdown(
         min-height: 100vh;
     }
 
-    /* Sembunyikan header bawaan Streamlit */
     header {visibility: hidden;}
 
-    .stNumberInput input {
+    /* Wrapper jadi satu pill utuh */
+    .stNumberInput [data-baseweb="input"] {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 50px !important;
+        overflow: hidden !important;
+        gap: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .stNumberInput input {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
         text-align: center !important;
         font-size: 1.0rem !important;
         font-weight: 600 !important;
-        background-color: rgba(255, 255, 255, 0.08) !important;
         color: #ffffff !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
 
-    .stNumberInput > div,
-    .stNumberInput [data-baseweb="input"] {
-        background-color: transparent !important;
+    .stNumberInput button {
+        background: transparent !important;
+        border: none !important;
+        color: #ffffff !important;
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+    }
+
+    .stNumberInput button:hover {
+        background: transparent !important;
+        color: #00b4d8 !important;
+        filter: drop-shadow(0 0 1px rgba(0, 180, 216, 0.8)) drop-shadow(0 0 4px rgba(0, 180, 216, 0.6)) drop-shadow(0 0 7px rgba(0, 180, 216, 0.4)) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stNumberInput > div {
+        background: transparent !important;
         border: none !important;
         box-shadow: none !important;
     }
 
+    /* Selectbox — khusus Page 2 */
     [data-testid="stSelectbox"] > div > div {
         background-color: rgba(255, 255, 255, 0.08) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -88,6 +113,21 @@ st.markdown(
     .stButton > button p {
         font-weight: 700 !important;
         color: white !important;
+    }
+    
+    [data-testid="stTooltipIcon"]:hover svg {
+        filter: drop-shadow(0 0 3px rgba(0, 180, 216, 1)) drop-shadow(0 0 7px rgba(0, 180, 216, 0.8)) drop-shadow(0 0 12px rgba(0, 180, 216, 0.6)) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    [data-testid="stButton"][key="back_btn"] button,
+        div:has(> [data-testid="stBaseButton-secondary"]) button {
+        border-radius: 50px !important;
+        background: transparent !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        color: white !important;
+        box-shadow: none !important;
+        margin-top: 50px;
     }
     </style>
     """,
@@ -143,7 +183,7 @@ required_keys = [
 if not all(key in st.session_state for key in required_keys):
     st.warning("Please complete all the form in page 1 first.")
     if st.button("Back to page 1"):
-        st.switch_page("app.py")
+        st.switch_page("Page_1.py")
     st.stop()
 
 with st.form("page2_form"):
@@ -251,5 +291,5 @@ if submitted:
 # To go back to page 1
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    if st.button("Back", use_container_width=True, type="secondary"):
+    if st.button("Back", use_container_width=True, key="back_btn"):
         st.switch_page("Page_1.py")
