@@ -1,7 +1,4 @@
 import streamlit as st
-from utils import render_nav
-
-st.set_page_config(initial_sidebar_state="collapsed")
 
 st.markdown(
     """
@@ -11,84 +8,31 @@ st.markdown(
     * {
         font-family: 'Inter', sans-serif !important;
     }
-
+            
     .stApp {
-        background: linear-gradient(160deg, #010a14 0%, #071525 50%, #0c1a2e 100%);
-        min-height: 100vh;
+        background-color: #3d8ef0;
     }
 
     /* Sembunyikan header bawaan Streamlit */
     header {visibility: hidden;}
 
-    @keyframes pulse-glow {
-        0%   { box-shadow: 0 0 6px rgba(0,212,255,0.4), 0 4px 15px rgba(0,180,216,0.35); }
-        50%  { box-shadow: 0 0 22px rgba(0,212,255,0.85), 0 4px 28px rgba(0,180,216,0.65); }
-        100% { box-shadow: 0 0 6px rgba(0,212,255,0.4), 0 4px 15px rgba(0,180,216,0.35); }
-    }
-    @keyframes fade-in-up {
-        from { opacity: 0; transform: translateY(28px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes title-shimmer {
-        0%   { background-position: 0% center; }
-        100% { background-position: 200% center; }
-    }
-
-    .gradient-title {
-        text-align: center;
-        background: linear-gradient(90deg, #00d4ff 0%, #a0c8ff 50%, #00d4ff 100%);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: title-shimmer 4s linear infinite;
-        filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.5));
-    }
-
     .stNumberInput input {
-        border-radius: 50px !important;
-        text-align: center !important;
-        font-size: 1.0rem !important;
-        font-weight: 600 !important;
-        background-color: rgba(0, 20, 45, 0.7) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(0, 212, 255, 0.25) !important;
-        transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
-    }
-
-    .stNumberInput input:focus {
-        border-color: rgba(0, 212, 255, 0.7) !important;
-        box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12) !important;
-        outline: none !important;
-    }
-
-    .stNumberInput > div,
-    .stNumberInput [data-baseweb="input"] {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+        border-radius: 50px;
+        text-align: center;
+        font-size: 1.0rem;
+        font-weight: 600;
     }
 
     label[data-testid="stWidgetLabel"] p {
         font-size: 1.1rem !important;
         font-weight: 400 !important;
     }
-
+            
     [data-testid="stForm"] {
-        border: 1px solid rgba(0, 212, 255, 0.18) !important;
-        padding: 2rem 2.5rem !important;
-        border-radius: 16px !important;
-        background: rgba(0, 180, 216, 0.06) !important;
-        backdrop-filter: blur(14px) !important;
-        -webkit-backdrop-filter: blur(14px) !important;
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6) !important;
-        animation: fade-in-up 0.5s ease both !important;
-        transition: border-color 0.35s ease, box-shadow 0.35s ease !important;
-    }
-
-    [data-testid="stForm"]:hover {
-        border-color: rgba(0, 212, 255, 0.55) !important;
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 28px rgba(0, 212, 255, 0.18) !important;
+        border: none;
+        padding: 0;
+        box-shadow: none;
+        background-color: transparent;
     }
 
     [data-testid="stFormSubmitButton"] {
@@ -99,33 +43,22 @@ st.markdown(
 
     [data-testid="stFormSubmitButton"] button {
         border-radius: 50px !important;
-        background: linear-gradient(90deg, #00d4ff, #0055a5) !important;
-        border: none !important;
-        animation: pulse-glow 2.4s ease-in-out infinite !important;
-        transition: transform 0.15s ease !important;
-    }
-
-    [data-testid="stFormSubmitButton"] button:hover {
-        transform: scale(1.03) !important;
     }
 
     [data-testid="stFormSubmitButton"] button p {
         font-weight: 700 !important;
         font-size: 1.1rem !important;
-        color: #ffffff !important;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-render_nav()
-
 # The Main Title
 st.markdown(
     """
-    <h1 class='gradient-title' style='margin-top: -60px; margin-bottom: -40px;'>MEASURE YOUR BURNOUT</h1>
-    <h1 class='gradient-title' style='margin-bottom: 20px;'>& PREDICT YOUR GRADE</h1>
+    <h1 style='text-align: center; margin-top: -60px; margin-bottom: -40px;'>MEASURE YOUR BURNOUT</h1>
+    <h1 style='text-align: center; margin-bottom: 20px;'>& PREDICT YOUR GRADE</h1>
     """,
     unsafe_allow_html=True,
 )

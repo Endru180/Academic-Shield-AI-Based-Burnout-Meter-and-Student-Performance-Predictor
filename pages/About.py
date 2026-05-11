@@ -13,11 +13,31 @@ st.markdown(
     }
 
     .stApp {
-        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        background: linear-gradient(160deg, #010a14 0%, #071525 50%, #0c1a2e 100%);
         min-height: 100vh;
     }
 
     header {visibility: hidden;}
+
+    @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(28px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes title-shimmer {
+        0%   { background-position: 0% center; }
+        100% { background-position: 200% center; }
+    }
+
+    .gradient-title {
+        text-align: center;
+        background: linear-gradient(90deg, #00d4ff 0%, #a0c8ff 50%, #00d4ff 100%);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: title-shimmer 4s linear infinite;
+        filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.5));
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -27,8 +47,8 @@ render_nav()
 
 st.markdown(
     """
-    <h1 style='text-align: center; margin-top: -60px; margin-bottom: -40px;'>MEASURE YOUR BURNOUT</h1>
-    <h1 style='text-align: center; margin-bottom: 20px;'>& PREDICT YOUR GRADE</h1>
+    <h1 class='gradient-title' style='margin-top: -60px; margin-bottom: -40px;'>MEASURE YOUR BURNOUT</h1>
+    <h1 class='gradient-title' style='margin-bottom: 20px;'>& PREDICT YOUR GRADE</h1>
     """,
     unsafe_allow_html=True,
 )
@@ -38,14 +58,16 @@ st.markdown("<br>", unsafe_allow_html=True)
 st.markdown(
     """
     <div style='
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(0, 212, 255, 0.18);
         padding: 2rem 2.5rem;
         border-radius: 16px;
-        background: rgba(255, 255, 255, 0.07);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        background: rgba(0, 180, 216, 0.06);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
         color: white;
+        animation: fade-in-up 0.5s ease both;
+        transition: border-color 0.35s ease, box-shadow 0.35s ease;
     '>
         <h3 style='margin-top: 0;'>How It Works</h3>
         <p style='line-height: 1.8; color: rgba(255,255,255,0.85);'>

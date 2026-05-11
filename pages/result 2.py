@@ -1,11 +1,8 @@
 import streamlit as st
 import plotly.graph_objects as go
-from utils import render_nav
 import pandas as pd
 import joblib
 import os
-
-st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
 
 # ⬇ Ngeload tiga file .pkl dari folder models, terus langsung disimpen di cache biar tiap kali
 # user mencet tombol "Analyze!", ga perlu ngeload lagi dari disk, cukup dari memory makanya
@@ -28,52 +25,14 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     * { font-family: 'Inter', sans-serif !important; }
-    .stApp {
-        background: linear-gradient(160deg, #010a14 0%, #071525 50%, #0c1a2e 100%);
-        min-height: 100vh;
-    }
+    .stApp { background-color: #3d8ef0; }
     header { visibility: hidden; }
 
-    @keyframes pulse-glow {
-        0%   { box-shadow: 0 0 6px rgba(0,212,255,0.4), 0 4px 15px rgba(0,180,216,0.35); }
-        50%  { box-shadow: 0 0 22px rgba(0,212,255,0.85), 0 4px 28px rgba(0,180,216,0.65); }
-        100% { box-shadow: 0 0 6px rgba(0,212,255,0.4), 0 4px 15px rgba(0,180,216,0.35); }
-    }
-    @keyframes fade-in-up {
-        from { opacity: 0; transform: translateY(28px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes title-shimmer {
-        0%   { background-position: 0% center; }
-        100% { background-position: 200% center; }
-    }
-
-    .gradient-title {
-        text-align: center;
-        background: linear-gradient(90deg, #00d4ff 0%, #a0c8ff 50%, #00d4ff 100%);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: title-shimmer 4s linear infinite;
-        filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.5));
-    }
-
     [data-testid="stForm"] {
-        border: 1px solid rgba(0, 212, 255, 0.18) !important;
-        padding: 2rem 2.5rem !important;
-        border-radius: 16px !important;
-        background: rgba(0, 180, 216, 0.06) !important;
-        backdrop-filter: blur(14px) !important;
-        -webkit-backdrop-filter: blur(14px) !important;
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6) !important;
-        animation: fade-in-up 0.5s ease both !important;
-        transition: border-color 0.35s ease, box-shadow 0.35s ease !important;
-    }
-
-    [data-testid="stForm"]:hover {
-        border-color: rgba(0, 212, 255, 0.55) !important;
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 28px rgba(0, 212, 255, 0.18) !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        background-color: transparent !important;
     }
 
    [data-testid="stRadio"] > div {
@@ -89,50 +48,26 @@ st.markdown(
 
     [data-testid="stFormSubmitButton"] button {
         border-radius: 50px !important;
-        background: linear-gradient(90deg, #00d4ff, #0055a5) !important;
-        border: none !important;
-        animation: pulse-glow 2.4s ease-in-out infinite !important;
-        transition: transform 0.15s ease !important;
-    }
-
-    [data-testid="stFormSubmitButton"] button:hover {
-        transform: scale(1.03) !important;
     }
 
     [data-testid="stFormSubmitButton"] button p {
         font-weight: 700 !important;
         font-size: 1.1rem !important;
-        color: #ffffff !important;
     }
 
     .stButton > button {
         border-radius: 50px !important;
-        background: linear-gradient(90deg, #00d4ff, #0055a5) !important;
+        background-color: #000000 !important;
         border: none !important;
-        animation: pulse-glow 2.4s ease-in-out infinite !important;
-        transition: transform 0.15s ease !important;
     }
     .stButton > button p {
         font-weight: 700 !important;
         color: white !important;
     }
-
-    [data-testid="stTextArea"] textarea {
-        background-color: rgba(0, 20, 45, 0.7) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(0, 212, 255, 0.25) !important;
-        border-radius: 8px !important;
-    }
-
-    [data-testid="stTextArea"] textarea::placeholder {
-        color: rgba(255, 255, 255, 0.4) !important;
-    }
     </style>
 """,
     unsafe_allow_html=True,
 )
-
-render_nav()
 
 # Checking jawabannya sebelum proses lebih jauh
 required_keys = [
@@ -165,8 +100,8 @@ depression_score     = st.session_state.depression_score
 
 st.markdown(
     """
-    <h1 class='gradient-title' style='margin-top: -60px; margin-bottom: -40px;'>MEASURE YOUR BURNOUT</h1>
-    <h1 class='gradient-title' style='margin-bottom: 20px;'>& PREDICT YOUR GRADE</h1>
+    <h1 style='text-align: center; margin-top: -60px; margin-bottom: -55px;'>MEASURE YOUR BURNOUT</h1>
+    <h1 style='text-align: center; margin-bottom: 20px;'>& PREDICT YOUR GRADE</h1>
     """,
     unsafe_allow_html=True,
 )
@@ -261,57 +196,6 @@ fig.update_layout(
 
 st.plotly_chart(fig, use_container_width=True)
 
-# Radar chart — lifestyle balance
-stress_numeric = {"Low": 8.0, "Moderate": 5.0, "High": 2.0}[stress_level_category]
-
-radar_labels = ["Study", "Sleep", "Extracurricular", "Social", "Physical", "Low Stress"]
-radar_values = [
-    study_hours / 10.0 * 10,       # max 10
-    sleep_hours / 12.0 * 10,       # max 12
-    eca_hours / 8.0 * 10,          # max 8
-    social_hours / 10.0 * 10,      # max 10
-    physical_hours / 8.0 * 10,     # max 8
-    stress_numeric,                 # Low=8, Moderate=5, High=2
-]
-radar_labels_closed = radar_labels + [radar_labels[0]]
-radar_values_closed = radar_values + [radar_values[0]]
-
-radar_fig = go.Figure(
-    go.Scatterpolar(
-        r=radar_values_closed,
-        theta=radar_labels_closed,
-        fill="toself",
-        fillcolor="rgba(0, 180, 216, 0.2)",
-        line=dict(color="#00b4d8", width=2),
-    )
-)
-radar_fig.update_layout(
-    polar=dict(
-        bgcolor="rgba(255,255,255,0.05)",
-        radialaxis=dict(
-            visible=True,
-            range=[0, 10],
-            tickfont=dict(color="rgba(255,255,255,0.5)", size=10),
-            gridcolor="rgba(255,255,255,0.1)",
-            linecolor="rgba(255,255,255,0.1)",
-        ),
-        angularaxis=dict(
-            tickfont=dict(color="white", size=12),
-            gridcolor="rgba(255,255,255,0.1)",
-            linecolor="rgba(255,255,255,0.15)",
-        ),
-    ),
-    paper_bgcolor="rgba(0,0,0,0)",
-    title={
-        "text": "Lifestyle Balance",
-        "x": 0.5,
-        "xanchor": "center",
-        "font": {"size": 18, "color": "white"},
-    },
-    margin=dict(t=60, b=40, l=60, r=60),
-)
-st.plotly_chart(radar_fig, use_container_width=True)
-
 # Prediksi GPA masa depan
 if predicted_gpa >= 3.5:
     gpa_label = "Excellent! Keep it up."
@@ -346,17 +230,15 @@ else:
 st.markdown(
     f"""
     <div style='
-        background: rgba(0, 212, 255, 0.05);
+        background-color: white;
         padding: 16px 20px;
-        color: rgba(255,255,255,0.9);
-        border: 1px solid rgba(0, 212, 255, 0.2);
-        border-left: 4px solid #00d4ff;
-        border-radius: 8px;
+        color: #000000;
+        border: 1px solid #000000;
+        border-left: 5px solid #000000;
         margin-top: 60px;
         margin-bottom: 70px;
-        box-shadow: 0 0 18px rgba(0, 212, 255, 0.08);
     '>
-        <span style='font-weight: 700; color: #00d4ff;'>Insight Message:</span> {insight_text}
+        <span style='font-weight: 700;'>Insight Message:</span> {insight_text}
     </div>
 """,
     unsafe_allow_html=True,
@@ -370,17 +252,10 @@ st.markdown(
 )
 
 with st.form("feedback_form"):
-    st.markdown(
-        "<p style='color:rgba(255,255,255,0.8); font-size:1rem; font-weight:600; margin-bottom:4px;'>Rate your experience</p>",
-        unsafe_allow_html=True,
-    )
     rating = st.radio(
         "Rate your experience",
-        options=[1, 2, 3, 4, 5],
-        format_func=lambda x: "★" * x,
-        index=None,
+        options=["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"],
         horizontal=True,
-        label_visibility="collapsed",
     )
     comment = st.text_area("Any comments?", placeholder="Write your thoughts here...")
 
@@ -392,10 +267,10 @@ with st.form("feedback_form"):
 
 if feedback_submitted:
     if rating is None:
-        st.error("Please select a star rating before submitting.")
+        st.warning("Please give a star rating first!")
     else:
         # Simpan feedback ke CSV
-        os.makedirs("feedback", exist_ok=True)
+        os.makedirs("feedback", exist_ok=True) # Buat folder feedback kalau belum ada. Kalau sudah ada, skip
         feedback_data = pd.DataFrame([{
             "study_hours":          study_hours,
             "sleep_hours":          sleep_hours,
@@ -411,7 +286,7 @@ if feedback_submitted:
             "depression_score":     depression_score,
             "burnout_score":        burnout_score,
             "predicted_gpa":        predicted_gpa,
-            "rating":               rating,
+            "rating":               rating.count("⭐"),
             "comment":              comment,
         }])
 
