@@ -1,10 +1,11 @@
 import streamlit as st
 
 from src.config import PAGE1_KEYS
-from src.ui import inject_css, render_animated_header, render_progress_bar, render_privacy_notice
+from src.ui import inject_css, render_animated_header, render_progress_bar, render_privacy_notice, render_neural_background
 
-st.set_page_config(page_title="Academic Shield — Step 2", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Academic Shield — Step 2", layout="centered")
 inject_css()
+render_neural_background()
 
 render_animated_header(
     "MEASURE YOUR BURNOUT & PREDICT YOUR GRADE",
@@ -39,7 +40,7 @@ with st.form("page2_form"):
         "Exam pressure level",
         min_value=0,
         max_value=10,
-        value=int(st.session_state.get("exam_pressure", 5)),
+        value=int(st.session_state.get("exam_pressure", 6)),
         help="How much pressure do you feel from upcoming exams? 0 = none, 10 = extreme.",
     )
 
@@ -47,7 +48,7 @@ with st.form("page2_form"):
         "Family expectation level",
         min_value=0,
         max_value=10,
-        value=int(st.session_state.get("family_expectation", 5)),
+        value=int(st.session_state.get("family_expectation", 4)),
         help="How much academic pressure do you feel from your family? 0 = none, 10 = extreme.",
     )
 
@@ -55,7 +56,7 @@ with st.form("page2_form"):
         "Financial stress level",
         min_value=0,
         max_value=10,
-        value=int(st.session_state.get("financial_stress", 5)),
+        value=int(st.session_state.get("financial_stress", 3)),
         help="How worried are you about financial matters? 0 = not at all, 10 = extremely.",
     )
 
@@ -63,7 +64,7 @@ with st.form("page2_form"):
         "Social support level",
         min_value=0,
         max_value=10,
-        value=int(st.session_state.get("social_support", 5)),
+        value=int(st.session_state.get("social_support", 7)),
         help="How supported do you feel by friends, family, or peers? 0 = none, 10 = fully supported.",
     )
 
@@ -71,7 +72,7 @@ with st.form("page2_form"):
         "Anxiety level",
         min_value=0,
         max_value=10,
-        value=int(st.session_state.get("anxiety_score", 5)),
+        value=int(st.session_state.get("anxiety_score", 4)),
         help="How anxious do you feel on a daily basis? 0 = calm, 10 = extremely anxious.",
     )
 
@@ -79,7 +80,7 @@ with st.form("page2_form"):
         "Depression level",
         min_value=0,
         max_value=10,
-        value=int(st.session_state.get("depression_score", 5)),
+        value=int(st.session_state.get("depression_score", 2)),
         help="How low or hopeless do you feel lately? 0 = not at all, 10 = severely.",
     )
 

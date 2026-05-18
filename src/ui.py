@@ -1,5 +1,6 @@
 """Shared UI — Claude-style warm, elegant design."""
 
+import json
 import streamlit as st
 import plotly.graph_objects as go
 
@@ -18,41 +19,20 @@ def inject_css():
             font-family: 'Material Symbols Rounded' !important;
         }
 
-        .stApp {
-            background-color: #FAF6F1;
-        }
-
-        /* Hide all Streamlit chrome */
-        header[data-testid="stHeader"] { display: none !important; }
-        [data-testid="stSidebarCollapsedControl"] { display: none !important; }
-        [data-testid="stSidebarCollapseButton"] { visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
-
-        /* Sidebar styling */
-        [data-testid="stSidebar"] {
+        body {
             background-color: #FAF6F1 !important;
-            border-right: 1px solid rgba(0,0,0,0.06) !important;
         }
-        [data-testid="stSidebar"] [data-testid="stSidebarNavItems"] a {
-            color: #2D2D2D !important;
-            font-weight: 500 !important;
-            font-family: 'Newsreader', Georgia, serif !important;
-        }
-        [data-testid="stSidebar"] [data-testid="stSidebarNavItems"] a:hover {
-            background-color: rgba(217, 119, 87, 0.08) !important;
+        .stApp {
+            background-color: transparent !important;
         }
 
-        /* Ensure sidebar toggle iframe doesn't take space */
-        iframe[title="streamlit_html.iframe"] {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 72px !important;
-            height: 72px !important;
-            border: none !important;
-            z-index: 999998 !important;
-            pointer-events: auto !important;
-            background: transparent !important;
-        }
+        /* Hide all Streamlit chrome + sidebar entirely */
+        header[data-testid="stHeader"] { display: none !important; }
+        [data-testid="stSidebar"] { display: none !important; }
+        [data-testid="stSidebarCollapsedControl"] { display: none !important; }
+        [data-testid="stSidebarCollapseButton"] { display: none !important; }
+        [data-testid="stExpandSidebarButton"] { display: none !important; }
+        section[data-testid="stSidebarContent"] { display: none !important; }
 
         /* ── Animations ── */
         @keyframes fadeInUp {
@@ -74,6 +54,9 @@ def inject_css():
         @keyframes breathe {
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
+        }
+        @keyframes drawBurnout {
+            to { stroke-dashoffset: 0; }
         }
 
         /* ── Serif display headings ── */
@@ -298,43 +281,6 @@ def inject_css():
         unsafe_allow_html=True,
     )
 
-    st.html(
-        """
-        <div id="sidebarToggle" style="
-            position: fixed; top: 16px; left: 16px; z-index: 999999;
-            width: 40px; height: 40px; border-radius: 10px;
-            background: #FFFFFF; border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s ease;
-        " title="Navigate pages">
-            <svg width="20" height="22" viewBox="0 0 64 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M32 2L4 16V36C4 52 16 66 32 70C48 66 60 52 60 36V16L32 2Z"
-                      fill="#D97757" opacity="0.25"/>
-                <path d="M32 2L4 16V36C4 52 16 66 32 70C48 66 60 52 60 36V16L32 2Z"
-                      fill="none" stroke="#D97757" stroke-width="3" opacity="0.6"/>
-            </svg>
-        </div>
-        <script>
-        document.getElementById('sidebarToggle').addEventListener('click', function() {
-            const doc = window.parent.document;
-            const collapse = doc.querySelector('[data-testid="stSidebarCollapseButton"]');
-            const expand = doc.querySelector('button[data-testid="stExpandSidebarButton"]') ||
-                           doc.querySelector('[data-testid="stSidebarCollapsedControl"] button');
-            if (collapse) { collapse.click(); }
-            else if (expand) { expand.click(); }
-        });
-        document.getElementById('sidebarToggle').addEventListener('mouseenter', function() {
-            this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.12)';
-            this.style.transform = 'scale(1.05)';
-        });
-        document.getElementById('sidebarToggle').addEventListener('mouseleave', function() {
-            this.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06)';
-            this.style.transform = 'scale(1)';
-        });
-        </script>
-        """
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -344,16 +290,25 @@ def inject_css():
 def render_shield_logo():
     st.markdown(
         """
-        <div style="text-align: center; margin-bottom: 12px; animation: fadeIn 0.8s ease-out;">
-            <svg width="52" height="60" viewBox="0 0 64 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M32 2L4 16V36C4 52 16 66 32 70C48 66 60 52 60 36V16L32 2Z"
-                      fill="#D97757" opacity="0.12"/>
-                <path d="M32 2L4 16V36C4 52 16 66 32 70C48 66 60 52 60 36V16L32 2Z"
-                      fill="none" stroke="#D97757" stroke-width="2" opacity="0.4"/>
-                <path d="M32 8L10 20V36C10 49 20 61 32 64C44 61 54 49 54 36V20L32 8Z"
-                      fill="none" stroke="#D97757" stroke-width="1" opacity="0.15"/>
-                <path d="M28 38L22 32L20 34L28 42L44 26L42 24L28 38Z"
-                      fill="#D97757" opacity="0.7"/>
+        <div style="text-align: center; margin-bottom: 16px; animation: fadeIn 0.8s ease-out;">
+            <svg width="180" height="64" viewBox="0 0 180 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Shield icon -->
+                <path d="M22 4L6 12V26C6 36.5 13 45.5 22 48C31 45.5 38 36.5 38 26V12L22 4Z"
+                      fill="#D97757" opacity="0.18"/>
+                <path d="M22 4L6 12V26C6 36.5 13 45.5 22 48C31 45.5 38 36.5 38 26V12L22 4Z"
+                      fill="none" stroke="#D97757" stroke-width="1.8" opacity="0.7"/>
+                <path d="M22 8L10 15V26C10 34 16 41.5 22 44C28 41.5 34 34 34 26V15L22 8Z"
+                      fill="none" stroke="#D97757" stroke-width="0.8" opacity="0.25"/>
+                <!-- Checkmark -->
+                <path d="M19.5 28.5L16 25L14.5 26.5L19.5 31.5L30 21L28.5 19.5L19.5 28.5Z"
+                      fill="#D97757" opacity="0.85"/>
+                <!-- Wordmark: Academic Shield -->
+                <text x="46" y="24" font-family="'Newsreader', Georgia, serif" font-size="14"
+                      font-weight="600" fill="#2D2D2D" letter-spacing="0.5">Academic</text>
+                <text x="46" y="42" font-family="'Newsreader', Georgia, serif" font-size="14"
+                      font-weight="400" fill="#D97757" letter-spacing="1">Shield</text>
+                <!-- Accent line -->
+                <line x1="46" y1="47" x2="148" y2="47" stroke="#D97757" stroke-width="1" opacity="0.25"/>
             </svg>
         </div>
         """,
@@ -367,6 +322,21 @@ def render_shield_logo():
 
 def render_animated_header(title: str, subtitle: str = ""):
     render_shield_logo()
+    # Wrap BURNOUT with animated SVG wave underline if present
+    if "BURNOUT" in title:
+        wave = (
+            '<span style="position:relative;display:inline-block;">'
+            "BURNOUT"
+            '<svg style="position:absolute;bottom:-5px;left:0;width:100%;height:12px;overflow:visible;"'
+            ' viewBox="0 0 200 12" preserveAspectRatio="none">'
+            '<path d="M0,8 Q50,2 100,8 Q150,14 200,8"'
+            ' stroke="#D97757" stroke-width="2.5" fill="none" stroke-linecap="round"'
+            ' stroke-dasharray="210" stroke-dashoffset="210"'
+            ' style="animation:drawBurnout 1.2s ease-out 0.6s forwards;"/>'
+            "</svg>"
+            "</span>"
+        )
+        title = title.replace("BURNOUT", wave)
     st.markdown(
         f'<h1 class="display-title">{title}</h1>',
         unsafe_allow_html=True,
@@ -416,7 +386,11 @@ def build_burnout_gauge(score: float, class_name: str, class_id: int) -> go.Figu
         go.Indicator(
             mode="gauge+number",
             value=score,
-            number={"suffix": "", "font": {"size": 44, "color": COLORS["text"], "family": "Inter"}},
+            number={
+                "suffix": "",
+                "font": {"size": 40, "color": COLORS["text"], "family": "Newsreader"},
+                "valueformat": ".0f",
+            },
             gauge={
                 "axis": {
                     "range": [0, 100],
@@ -442,26 +416,29 @@ def build_burnout_gauge(score: float, class_name: str, class_id: int) -> go.Figu
     )
 
     fig.update_layout(
-        height=280,
-        margin=dict(l=30, r=30, t=60, b=10),
+        height=300,
+        margin=dict(l=30, r=30, t=50, b=60),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font_color=COLORS["text"],
         title={
             "text": "Burnout Level",
             "x": 0.5,
-            "y": 0.97,
+            "y": 0.98,
             "xanchor": "center",
-            "font": {"size": 14, "color": "#9B9B9B", "family": "Inter"},
+            "font": {"size": 13, "color": "#9B9B9B", "family": "Newsreader"},
         },
         annotations=[
             {
                 "text": f"<b>{class_name}</b>",
                 "x": 0.5,
-                "y": 0.22,
+                "y": -0.12,
                 "showarrow": False,
-                "font": {"size": 20, "color": label_color, "family": "Inter"},
+                "font": {"size": 18, "color": label_color, "family": "Newsreader"},
                 "xanchor": "center",
+                "yanchor": "bottom",
+                "xref": "paper",
+                "yref": "paper",
             }
         ],
     )
@@ -564,8 +541,146 @@ def render_privacy_notice():
 
 
 # ---------------------------------------------------------------------------
+# Typewriter insight card
+# ---------------------------------------------------------------------------
+
+def render_insight_card_animated(text: str, color: str):
+    import streamlit.components.v1 as components
+
+    escaped = json.dumps(text)
+    html = f"""<!DOCTYPE html><html><head>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap');
+*{{margin:0;padding:0;box-sizing:border-box;}}
+body{{background:#FAF6F1;overflow:hidden;font-family:'Newsreader',Georgia,serif;}}
+@keyframes blink{{0%,100%{{opacity:1}}50%{{opacity:0}}}}
+.card{{background:#fff;border:1px solid rgba(0,0,0,0.06);border-left:4px solid {color};
+       border-radius:12px;padding:20px 24px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}}
+.label{{font-weight:700;color:{color};font-size:0.9rem;letter-spacing:0.2px;}}
+.text{{margin-top:8px;line-height:1.75;color:#4B4B4B;font-size:0.93rem;min-height:2em;}}
+.cur{{color:{color};animation:blink 1s step-end infinite;font-weight:300;}}
+</style></head><body>
+<div class="card">
+  <div class="label">Insight</div>
+  <div class="text" id="p"><span class="cur" id="cur">|</span></div>
+</div>
+<script>
+var t={escaped},i=0,p=document.getElementById('p'),c=document.getElementById('cur');
+function go(){{
+  if(i<t.length){{p.insertBefore(document.createTextNode(t[i++]),c);setTimeout(go,14);}}
+  else{{setTimeout(function(){{c.style.display='none';}},2000);}}
+}}
+setTimeout(go,420);
+</script>
+</body></html>"""
+    components.html(html, height=130, scrolling=False)
+
+
+# ---------------------------------------------------------------------------
 # Divider
 # ---------------------------------------------------------------------------
 
 def render_divider():
     st.markdown('<div class="warm-divider"></div>', unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------------------------
+# Neural background + SVG favicon — injected into parent document
+# ---------------------------------------------------------------------------
+
+def render_neural_background():
+    import streamlit.components.v1 as components
+
+    components.html(
+        """
+<script>
+(function() {
+    var doc = window.parent.document;
+    var win = window.parent;
+
+    // ── Persistent hide CSS — survives Streamlit page transitions ──
+    if (!doc.getElementById('as-global-hide')) {
+        var hide = doc.createElement('style');
+        hide.id = 'as-global-hide';
+        hide.textContent = [
+            '[data-testid="stSidebar"]{display:none!important;}',
+            '[data-testid="stSidebarCollapsedControl"]{display:none!important;}',
+            '[data-testid="stSidebarCollapseButton"]{display:none!important;}',
+            '[data-testid="stExpandSidebarButton"]{display:none!important;}',
+            'section[data-testid="stSidebarContent"]{display:none!important;}',
+            'header[data-testid="stHeader"]{display:none!important;}',
+        ].join('');
+        doc.head.appendChild(hide);
+    }
+
+    // ── SVG favicon ──
+    doc.querySelectorAll('link[rel*="icon"]').forEach(function(l) { l.remove(); });
+    var fav = doc.createElement('link');
+    fav.rel = 'icon';
+    fav.type = 'image/svg+xml';
+    fav.href = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"%3E%3Cpath d="M16 2L4 8v10c0 8 5.5 13.5 12 16 6.5-2.5 12-8 12-16V8L16 2z" fill="%23D97757" opacity="0.9"/%3E%3Cpath d="M13.5 17.5l-3-3-1.5 1.5 4.5 4.5 9-9-1.5-1.5z" fill="white"/%3E%3C/svg%3E';
+    doc.head.appendChild(fav);
+
+    // ── Neural animation — inject as native <script> in parent <head> ──
+    // Code runs in parent window scope, no iframe lifetime dependency.
+    if (doc.getElementById('as-neural-script')) return;
+
+    // Create canvas before script executes so it exists immediately
+    var canvas = doc.createElement('canvas');
+    canvas.id = 'as-neural-canvas';
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
+    doc.body.insertBefore(canvas, doc.body.firstChild);
+
+    var script = doc.createElement('script');
+    script.id = 'as-neural-script';
+    script.textContent = '(function(){'
+        + 'var CW=730,N=30,MD=190,SP=0.22,nodes=[];'
+        + 'function mkCanvas(){'
+        + '  var c=document.getElementById("as-neural-canvas");'
+        + '  if(!c){c=document.createElement("canvas");c.id="as-neural-canvas";'
+        + '    c.style.cssText="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;";'
+        + '    document.body.insertBefore(c,document.body.firstChild);}'
+        + '  c.width=window.innerWidth;c.height=window.innerHeight;return c;'
+        + '}'
+        + 'var c0=mkCanvas();'
+        + 'window.addEventListener("resize",function(){var c=document.getElementById("as-neural-canvas");if(c){c.width=window.innerWidth;c.height=window.innerHeight;}});'
+        + 'for(var i=0;i<N;i++){'
+        + '  var s=i<N/2?"left":"right",sw=Math.max((c0.width-CW)/2,80);'
+        + '  nodes.push({x:s==="left"?Math.random()*sw:c0.width-Math.random()*sw,'
+        + '    y:Math.random()*c0.height,vx:(Math.random()-0.5)*SP,vy:(Math.random()-0.5)*SP,'
+        + '    r:2+Math.random()*2.5,pulse:Math.random()*Math.PI*2,side:s});'
+        + '}'
+        + 'function draw(){'
+        + '  var c=document.getElementById("as-neural-canvas");'
+        + '  if(!c)c=mkCanvas();'
+        + '  var ctx=c.getContext("2d");'
+        + '  ctx.clearRect(0,0,c.width,c.height);'
+        + '  var lm=(c.width-CW)/2+24,rm=(c.width+CW)/2-24;'
+        + '  for(var k=0;k<nodes.length;k++){'
+        + '    var n=nodes[k];n.x+=n.vx;n.y+=n.vy;n.pulse+=0.012;'
+        + '    if(n.y<0){n.y=0;n.vy=Math.abs(n.vy);}if(n.y>c.height){n.y=c.height;n.vy=-Math.abs(n.vy);}'
+        + '    if(n.x<0){n.x=0;n.vx=Math.abs(n.vx);}if(n.x>c.width){n.x=c.width;n.vx=-Math.abs(n.vx);}'
+        + '    if(n.side==="left"&&n.x>lm)n.vx=-Math.abs(n.vx);'
+        + '    if(n.side==="right"&&n.x<rm)n.vx=Math.abs(n.vx);'
+        + '  }'
+        + '  for(var i=0;i<nodes.length;i++){for(var j=i+1;j<nodes.length;j++){'
+        + '    var dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d=Math.sqrt(dx*dx+dy*dy);'
+        + '    if(d<MD){ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);'
+        + '      ctx.strokeStyle="rgba(217,119,87,"+((1-d/MD)*0.22)+")";ctx.lineWidth=1;ctx.stroke();}'
+        + '  }}'
+        + '  for(var m=0;m<nodes.length;m++){'
+        + '    var nd=nodes[m],p=0.5+0.5*Math.sin(nd.pulse);'
+        + '    ctx.beginPath();ctx.arc(nd.x,nd.y,nd.r+p*0.8,0,Math.PI*2);'
+        + '    ctx.fillStyle="rgba(217,119,87,"+(0.38+0.18*p)+")";ctx.fill();'
+        + '  }'
+        + '  requestAnimationFrame(draw);'
+        + '}'
+        + 'requestAnimationFrame(draw);'
+        + '})();';
+    doc.head.appendChild(script);
+})();
+</script>
+""",
+        height=0,
+        scrolling=False,
+    )

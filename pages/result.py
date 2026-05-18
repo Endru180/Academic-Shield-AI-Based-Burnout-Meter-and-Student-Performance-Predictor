@@ -11,10 +11,13 @@ from src.ui import (
     render_gpa_ring,
     render_probability_bars,
     render_divider,
+    render_neural_background,
+    render_insight_card_animated,
 )
 
-st.set_page_config(page_title="Academic Shield — Results", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Academic Shield — Results", layout="centered")
 inject_css()
+render_neural_background()
 
 # ---------------------------------------------------------------------------
 # Validate inputs
@@ -82,20 +85,9 @@ render_divider()
 
 insight_text = INSIGHTS.get(burnout["class_id"], INSIGHTS[0])
 color_map = {0: COLORS["healthy"], 1: COLORS["mild"], 2: COLORS["burnout"]}
-insight_color = color_map.get(burnout["class_id"], COLORS["white"])
+insight_color = color_map.get(burnout["class_id"], COLORS["healthy"])
 
-st.markdown(
-    f"""
-    <div class="insight-card" style="border-left-color: {insight_color};">
-        <span style="font-weight: 700; color: {insight_color};">Insight</span>
-        <p style="margin-top: 8px; margin-bottom: 0; line-height: 1.6;
-                  color: rgba(255,255,255,0.85);">
-            {insight_text}
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+render_insight_card_animated(insight_text, insight_color)
 
 # ---------------------------------------------------------------------------
 # Feedback
