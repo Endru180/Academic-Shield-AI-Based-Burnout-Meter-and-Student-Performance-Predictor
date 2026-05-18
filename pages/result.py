@@ -7,18 +7,21 @@ import os
 # ⬇ Ngeload tiga file .pkl dari folder models, terus langsung disimpen di cache biar tiap kali
 # user mencet tombol "Analyze!", ga perlu ngeload lagi dari disk, cukup dari memory makanya
 # latencynya bisa low
-@st.cache_resource # Ini yg jadi pemain utama urusan caching
+@st.cache_resource
 def load_models():
     try:
-        model_a       = joblib.load("models/modelA.pkl") # Model pertama, namanya burnout_model, ngepredict skor burnoutnya
-        model_b       = joblib.load("models/modelB.pkl") # Model kedua, namanya grade_model, ngepredict future GPA-nya
-        stress_mapping = joblib.load("models/stress_level_encoder_modelB.pkl") # Label Encoder buat input yang kategorical kayak stress levelnya
-        return model_a, model_b, stress_mapping
+        model_a             = joblib.load("models/modelA.pkl")
+        model_b             = joblib.load("models/modelB.pkl")
+        stress_mapping      = joblib.load("models/stress_level_encoder_modelB.pkl")
+        pipeline_a          = joblib.load("models/pipeline_a.pkl")
+        pipeline_b          = joblib.load("models/pipeline_b.pkl")
+        burnout_class_map   = joblib.load("models/burnout_class_mapping.pkl")
+        return model_a, model_b, stress_mapping, pipeline_a, pipeline_b, burnout_class_map
     except Exception as e:
         st.error(f"Failed to load models: {e}")
-        return None, None, None
+        return None, None, None, None, None, None
 
-model_a, model_b, stress_mapping = load_models() # Assign model_burnout yang direturn load_models ke variabel model_a. Sama juga buat yang duanya lagi (model_b & stress_mapping)
+model_a, model_b, stress_mapping, pipeline_a, pipeline_b, burnout_class_map = load_models()
 
 st.markdown(
     """
@@ -106,7 +109,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Mapping buat stress levelnya, assign value khusus untuk stress levelnya buat model_a
 stress_mapping_a = {"Low": 2.29, "Moderate": 4.80, "High": 7.42}
 stress_for_model_a = stress_mapping_a[stress_level_category]
 stress_for_model_b = stress_mapping[stress_level_category]
@@ -121,12 +123,11 @@ input_model_a = pd.DataFrame([{
     "anxiety_score":       anxiety_score,
     "depression_score":    depression_score,
     "family_expectation":  family_expectation,
+    "physical_activity":   physical_hours,
 }])
 
-study_hours_for_b = study_hours if study_hours >= 5.0 else 7.48
-
 input_model_b = pd.DataFrame([{
-    "study_hours":    study_hours_for_b,
+    "study_hours":    study_hours,
     "eca_hours":      eca_hours,
     "sleep_hours":    sleep_hours,
     "social_hours":   social_hours,
@@ -134,22 +135,29 @@ input_model_b = pd.DataFrame([{
     "stress_level":   stress_for_model_b,
 }])
 
-# Mesin prediktor utamanya
-if model_a is not None and model_b is not None:
-    burnout_raw    = model_a.predict(input_model_a)[0]
-    burnout_score  = round(float(burnout_raw) * 10, 1)
-    burnout_score  = max(0.0, min(100.0, burnout_score))
-    predicted_gpa  = round(float(model_b.predict(input_model_b)[0]), 2)
+if model_a is not None and model_b is not None and pipeline_a is not None and pipeline_b is not None and burnout_class_map is not None:
+    # Model A — Classification with predict_proba for gauge
+    input_a_engineered = pipeline_a(input_model_a)
+    burnout_class  = int(model_a.predict(input_a_engineered)[0])          # 0, 1, or 2
+    burnout_proba  = model_a.predict_proba(input_a_engineered)[0]         # [p_healthy, p_mild, p_burnout]
+    # Weighted pseudo-score mapped to 0-100 for the gauge display
+    burnout_score  = float(burnout_proba[0] * 20 + burnout_proba[1] * 55 + burnout_proba[2] * 85)
+    burnout_score  = round(max(0.0, min(100.0, burnout_score)), 1)
+
+    # Model B — Regression (unchanged)
+    input_b_engineered = pipeline_b["engineer_fn"](input_model_b)
+    input_b_final = input_b_engineered[pipeline_b["important_features"]]
+    predicted_gpa  = round(float(model_b.predict(input_b_final)[0]), 2)
     predicted_gpa  = max(0.0, min(4.0, predicted_gpa))
 else:
     st.error("Models failed to load. Please contact the administrator.")
     st.stop()
 
-# Prediksi skor burnout saat ini
-if burnout_score >= 70:
+# Burnout label derived from classifier prediction (not score thresholds)
+if burnout_class == 2:
     burnout_label = "BURNOUT."
     burnout_color = "#e74c3c"
-elif burnout_score >= 40:
+elif burnout_class == 1:
     burnout_label = "MILDLY BURNOUT."
     burnout_color = "#f39c12"
 else:
@@ -219,10 +227,10 @@ with col2:
         unsafe_allow_html=True,
     )
 
-# Pesan insight yang dihasilkan tergantung skor burnout yang diprediksi
-if burnout_score >= 70:
+# Insight message based on classifier prediction
+if burnout_class == 2:
     insight_text = "Your burnout level is high! Try increasing your sleep to at least 7 hours and reduce study time slightly."
-elif burnout_score >= 40:
+elif burnout_class == 1:
     insight_text = "You're showing early signs of stress. Make sure to schedule breaks and social activities."
 else:
     insight_text = "You're in good shape! Keep maintaining this balanced lifestyle."
