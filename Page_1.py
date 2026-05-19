@@ -2,7 +2,7 @@ import streamlit as st
 
 from src.ui import inject_css, render_animated_header, render_progress_bar, render_neural_background
 
-st.set_page_config(page_title="Academic Shield", layout="centered")
+st.set_page_config(page_title="Academic Shield", layout="centered", initial_sidebar_state="collapsed")
 inject_css()
 render_neural_background()
 
