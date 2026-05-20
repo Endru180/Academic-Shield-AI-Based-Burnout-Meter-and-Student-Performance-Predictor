@@ -1,4 +1,4 @@
-"""Feature engineering functions for Model A and Model B.
+"""Feature engineering functions for Model A and Model B's experimentation.
 
 These must match the functions that were cloudpickled in the notebooks.
 They are injected into __main__ before loading the pkl files so that
