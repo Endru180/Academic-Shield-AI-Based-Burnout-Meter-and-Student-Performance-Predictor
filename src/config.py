@@ -23,6 +23,12 @@ MODEL_A_BASE_FEATURES = [
 ]
 
 BURNOUT_CLASSES = {0: "Healthy", 1: "Mildly Burnout", 2: "Burnout"}
+# Converts predict_proba output → gauge score (0-100)
+# Weights chosen so pure-class predictions land in correct gauge segment:
+# Class 0 - Healthy (weight = 20) → gauge [0-40]
+# Class 1 - Mild (weight = 55) → gauge [40-70]
+# Class 2 - Burnout (weight = 85) → gauge [70-100]
+# Formula = proba[0] * 20 + proba[1] * 55 + proba[2] * 85
 BURNOUT_SCORE_WEIGHTS = [20, 55, 85]
 
 # ---------------------------------------------------------------------------
