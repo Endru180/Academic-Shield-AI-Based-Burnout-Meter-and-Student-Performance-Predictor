@@ -36,7 +36,7 @@ with st.form("page1_form"):
     eca_hours = st.slider(
         "Extracurricular activities (hours/day)?",
         min_value=0.0,
-        max_value=8.0,
+        max_value=6.0,
         step=0.5,
         value=st.session_state.get("eca_hours", 1.0),
         help="Time spent on clubs, organizations, or extracurricular activities per day.",
@@ -45,7 +45,7 @@ with st.form("page1_form"):
     social_hours = st.slider(
         "How many hours do you socialize per day?",
         min_value=0.0,
-        max_value=10.0,
+        max_value=9.0,
         step=0.5,
         value=st.session_state.get("social_hours", 5.0),
         help="Time spent hanging out with friends or family per day.",
@@ -54,7 +54,7 @@ with st.form("page1_form"):
     physical_hours = st.slider(
         "How many hours do you exercise per day?",
         min_value=0.0,
-        max_value=8.0,
+        max_value=6.0,
         step=0.5,
         value=st.session_state.get("physical_hours", 2.0),
         help="Time spent on exercise, sports, or any physical activity per day.",
