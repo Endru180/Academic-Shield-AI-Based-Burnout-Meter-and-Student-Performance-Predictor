@@ -92,7 +92,7 @@ def predict_gpa(inputs: dict, models: dict) -> dict:
         "sleep_hours":   (5.0, 10.0, 7.50),
         "eca_hours":     (0.0,  4.0, 1.99),
         "social_hours":  (0.0,  6.0, 2.70),
-        "physical_hours":(0.0, 11.0, 4.33),
+        "physical_hours":(0.0, 13.0, 4.33),
     }
 
     def clamp(key):
