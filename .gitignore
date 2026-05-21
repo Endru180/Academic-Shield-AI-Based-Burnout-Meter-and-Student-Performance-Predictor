@@ -217,5 +217,3 @@ feedback/*.csv
 # CatBoost training logs
 catboost_info/
 
-#streamlit
-*.streamlit/

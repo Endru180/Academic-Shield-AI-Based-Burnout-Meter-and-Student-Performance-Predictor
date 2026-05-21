@@ -124,9 +124,8 @@ def render_insight_card_animated(text: str, color: str):
     escaped = json.dumps(text)
     html = f"""<!DOCTYPE html><html><head>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400;0,6..72,600&display=swap');
 *{{margin:0;padding:0;box-sizing:border-box;}}
-body{{background:#FAF6F1;overflow:hidden;font-family:'Newsreader',Georgia,serif;padding:4px 0;}}
+body{{background:#FAF6F1;overflow:hidden;font-family:'Newsreader',Georgia,'Times New Roman',serif;padding:4px 0;}}
 @keyframes blink{{0%,100%{{opacity:1}}50%{{opacity:0}}}}
 @keyframes fadeIn{{from{{opacity:0;transform:translateY(6px)}}to{{opacity:1;transform:none}}}}
 .wrap{{
@@ -158,7 +157,7 @@ function go(){{
   if(i<t.length){{p.insertBefore(document.createTextNode(t[i++]),c);setTimeout(go,13);}}
   else{{setTimeout(function(){{c.style.display='none';}},2000);}}
 }}
-setTimeout(go,380);
+setTimeout(go,60);
 </script>
 </body></html>"""
     components.html(html, height=120, scrolling=False)
