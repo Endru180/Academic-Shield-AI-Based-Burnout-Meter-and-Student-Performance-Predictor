@@ -47,7 +47,7 @@ with st.form("page1_form"):
         min_value=0.0,
         max_value=9.0,
         step=0.5,
-        value=st.session_state.get("social_hours", 5.0),
+        value=st.session_state.get("social_hours", 3.0),
         help="Time spent hanging out with friends or family per day.",
     )
 
