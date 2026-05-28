@@ -14,6 +14,7 @@ from src.ui import (
     render_divider,
     render_neural_background,
     render_insight_card_animated,
+    render_hamburger_menu,
 )
 
 st.set_page_config(
@@ -23,6 +24,7 @@ st.set_page_config(
 )
 inject_css()
 render_neural_background()
+render_hamburger_menu()
 
 # ---------------------------------------------------------------------------
 # Validate inputs

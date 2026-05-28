@@ -131,11 +131,11 @@ def render_radar_chart(inputs: dict):
         "Social Support", "Anxiety", "Depression",
     ]
     values = [
-        float(inputs.get("study_hours", 0)) * 10 / 12,
-        float(inputs.get("sleep_hours", 0)) * 10 / 12,
-        float(inputs.get("physical_hours", 0)) * 10 / 8,
-        float(inputs.get("social_hours", 0)),
-        float(inputs.get("eca_hours", 0)) * 10 / 8,
+        min(float(inputs.get("study_hours", 0)) * 10 / 10, 10),
+        min(float(inputs.get("sleep_hours", 0)) * 10 / 10, 10),
+        min(float(inputs.get("physical_hours", 0)) * 10 / 13, 10),
+        min(float(inputs.get("social_hours", 0)) * 10 / 6, 10),
+        min(float(inputs.get("eca_hours", 0)) * 10 / 4, 10),
         stress_map.get(inputs.get("stress_level_category", "Moderate"), 5.0),
         float(inputs.get("exam_pressure", 0)),
         float(inputs.get("family_expectation", 0)),

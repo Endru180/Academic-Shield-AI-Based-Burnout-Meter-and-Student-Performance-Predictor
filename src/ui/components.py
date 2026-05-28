@@ -35,10 +35,12 @@ def render_shield_logo():
 
 def render_animated_header(title: str, subtitle: str = ""):
     render_shield_logo()
-    if "BURNOUT" in title:
+    # Case-insensitive check for Burnout to apply the wave effect
+    target_word = "BURNOUT" if "BURNOUT" in title else "Burnout"
+    if target_word in title:
         wave = (
-            '<span style="position:relative;display:inline-block;">'
-            "BURNOUT"
+            f'<span style="position:relative;display:inline-block;">'
+            f"{target_word}"
             '<svg style="position:absolute;bottom:-5px;left:0;width:100%;height:12px;overflow:visible;"'
             ' viewBox="0 0 200 12" preserveAspectRatio="none">'
             '<path d="M0,8 Q50,2 100,8 Q150,14 200,8"'
@@ -48,7 +50,7 @@ def render_animated_header(title: str, subtitle: str = ""):
             "</svg>"
             "</span>"
         )
-        title = title.replace("BURNOUT", wave)
+        title = title.replace(target_word, wave)
     st.markdown(
         f'<h1 class="display-title">{title}</h1>',
         unsafe_allow_html=True,
@@ -165,3 +167,93 @@ setTimeout(go,60);
 
 def render_divider():
     st.markdown('<div class="warm-divider"></div>', unsafe_allow_html=True)
+
+
+def render_hamburger_menu():
+    import streamlit.components.v1 as components
+    components.html(
+        """
+<script>
+(function(){
+  var doc = window.parent.document;
+  if (doc.getElementById('as-hamburger-btn')) return;
+
+  // ── Define functions on parent window FIRST ──
+  window.parent.asToggleDrawer = function(){
+    var d = doc.getElementById('as-drawer');
+    var o = doc.getElementById('as-overlay');
+    if (d.classList.contains('as-open')){
+      d.classList.remove('as-open'); o.classList.remove('as-open');
+    } else {
+      d.classList.add('as-open'); o.classList.add('as-open');
+    }
+  };
+  window.parent.asCloseDrawer = function(){
+    doc.getElementById('as-drawer').classList.remove('as-open');
+    doc.getElementById('as-overlay').classList.remove('as-open');
+  };
+
+  // ── Styles ──
+  var style = doc.createElement('style');
+  style.id = 'as-hamburger-style';
+  style.textContent = [
+    '#as-hamburger-btn{position:fixed;top:18px;right:18px;z-index:9999;width:40px;height:40px;border-radius:10px;background:#FAF6F1;border:1px solid rgba(0,0,0,0.08);box-shadow:0 2px 8px rgba(0,0,0,0.08);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:box-shadow 0.2s;}',
+    '#as-hamburger-btn:hover{box-shadow:0 4px 16px rgba(217,119,87,0.2);}',
+    '#as-hamburger-btn .as-bar{width:18px;height:2px;background:#2D2D2D;border-radius:2px;}',
+    '#as-drawer{position:fixed;top:0;right:-320px;width:300px;height:100%;background:#FAF6F1;z-index:9998;box-shadow:-4px 0 24px rgba(0,0,0,0.10);transition:right 0.35s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;padding:64px 28px 40px;font-family:Newsreader,Georgia,serif;}',
+    '#as-drawer.as-open{right:0;}',
+    '#as-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:9997;pointer-events:none;transition:background 0.35s;}',
+    '#as-overlay.as-open{background:rgba(0,0,0,0.18);pointer-events:all;}',
+    '#as-drawer .as-close{position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:1.2rem;color:#9B9B9B;padding:4px 8px;border-radius:6px;}',
+    '#as-drawer .as-close:hover{color:#2D2D2D;}',
+    '#as-drawer .as-sec{font-size:0.65rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#D97757;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(217,119,87,0.15);}',
+    '#as-drawer .as-tip{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;}',
+    '#as-drawer .as-tip-icon{flex-shrink:0;width:28px;height:28px;border-radius:8px;background:rgba(217,119,87,0.08);display:flex;align-items:center;justify-content:center;font-size:0.85rem;}',
+    '#as-drawer .as-tip-text{font-size:0.85rem;color:#4B4B4B;line-height:1.6;}',
+    '#as-drawer .as-tip-text b{color:#2D2D2D;}',
+    '#as-drawer .as-about{background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:16px 18px;margin-bottom:12px;font-size:0.85rem;color:#4B4B4B;line-height:1.65;}',
+    '#as-drawer .as-about b{color:#2D2D2D;}',
+    '#as-drawer .as-div{height:1px;background:rgba(0,0,0,0.06);margin:24px 0;}',
+  ].join('');
+  doc.head.appendChild(style);
+
+  // ── Overlay ──
+  var overlay = doc.createElement('div');
+  overlay.id = 'as-overlay';
+  overlay.setAttribute('onclick', 'asCloseDrawer()');
+  doc.body.appendChild(overlay);
+
+  // ── Hamburger button ──
+  var btn = doc.createElement('div');
+  btn.id = 'as-hamburger-btn';
+  btn.title = 'Menu';
+  btn.innerHTML = '<div class="as-bar"></div><div class="as-bar"></div><div class="as-bar"></div>';
+  btn.setAttribute('onclick', 'asToggleDrawer()');
+  doc.body.appendChild(btn);
+
+  // ── Drawer ──
+  var drawer = doc.createElement('div');
+  drawer.id = 'as-drawer';
+  drawer.innerHTML = [
+    '<button class="as-close" onclick="asCloseDrawer()">&#x2715;</button>',
+    '<div class="as-sec">Tips</div>',
+    '<div class="as-tip"><div class="as-tip-icon">&#128564;</div><div class="as-tip-text"><b>Sleep 7&#8211;9 hours.</b> Sleep is the single biggest predictor of academic performance and burnout recovery.</div></div>',
+    '<div class="as-tip"><div class="as-tip-icon">&#128218;</div><div class="as-tip-text"><b>Study in focused blocks.</b> 4&#8211;6 hours of deep work beats 10 hours of distracted studying.</div></div>',
+    '<div class="as-tip"><div class="as-tip-icon">&#127939;</div><div class="as-tip-text"><b>Move daily.</b> Even 30 minutes of exercise reduces anxiety and improves memory consolidation.</div></div>',
+    '<div class="as-tip"><div class="as-tip-icon">&#129309;</div><div class="as-tip-text"><b>Lean on your support network.</b> Social connection is a strong buffer against burnout.</div></div>',
+    '<div class="as-tip"><div class="as-tip-icon">&#9878;</div><div class="as-tip-text"><b>Balance your day.</b> Allocate time across study, rest, social, and physical activity.</div></div>',
+    '<div class="as-tip"><div class="as-tip-icon">&#129496;</div><div class="as-tip-text"><b>Notice early signs.</b> Persistent fatigue, low motivation, and difficulty concentrating are early burnout signals.</div></div>',
+    '<div class="as-div"></div>',
+    '<div class="as-sec">About</div>',
+    '<div class="as-about"><b>Academic Shield</b> is an AI-powered tool that estimates your burnout risk and predicts your GPA based on your daily lifestyle and mental health habits.</div>',
+    '<div class="as-about"><b>How it works:</b> Two machine learning models analyze your inputs &#8212; one classifies burnout level (Healthy / Mildly Burnout / Burnout), the other predicts your GPA on a 0&#8211;4.0 scale.</div>',
+    '<div class="as-about"><b>Privacy:</b> All inputs are processed locally and are never stored or transmitted. Your data stays on your device.</div>',
+    '<div class="as-about" style="font-size:0.78rem;color:#9B9B9B;">Built for educational purposes. Results are estimates and should not replace professional mental health advice.</div>',
+  ].join('');
+  doc.body.appendChild(drawer);
+})();
+</script>
+""",
+        height=0,
+        scrolling=False,
+    )
