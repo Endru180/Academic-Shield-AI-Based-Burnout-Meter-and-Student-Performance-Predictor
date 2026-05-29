@@ -141,27 +141,22 @@ with st.form("feedback_form"):
         )
 
 if feedback_submitted:
-    if rating is None:
-        st.warning("Please give a star rating first!")
-    else:
-        os.makedirs("feedback", exist_ok=True)
-        feedback_data = pd.DataFrame(
-            [
-                {
-                    **inputs,
-                    "burnout_score": burnout["score"],
-                    "burnout_class": burnout["class_name"],
-                    "predicted_gpa": gpa["gpa"],
-                    "rating": rating.count("⭐"),
-                    "comment": comment,
-                }
-            ]
-        )
-        file_exists = os.path.exists(FEEDBACK_PATH)
-        feedback_data.to_csv(
-            FEEDBACK_PATH, mode="a", header=not file_exists, index=False
-        )
-        st.success("Thank you for your feedback!")
+    os.makedirs("feedback", exist_ok=True)
+    feedback_data = pd.DataFrame(
+        [
+            {
+                **inputs,
+                "burnout_gauge_score": burnout["score"],
+                "burnout_class": burnout["class_name"],
+                "predicted_gpa": gpa["gpa"],
+                "rating": rating.count("⭐"),
+                "comment": comment,
+            }
+        ]
+    )
+    file_exists = os.path.exists(FEEDBACK_PATH)
+    feedback_data.to_csv(FEEDBACK_PATH, mode="a", header=not file_exists, index=False)
+    st.success("Thank you for your feedback!")
 
 # ---------------------------------------------------------------------------
 # Navigation

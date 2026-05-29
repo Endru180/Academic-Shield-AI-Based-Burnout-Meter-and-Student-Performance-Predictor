@@ -131,8 +131,8 @@ def render_radar_chart(inputs: dict):
         "Social Support", "Anxiety", "Depression",
     ]
     values = [
-        min(float(inputs.get("study_hours", 0)) * 10 / 10, 10),
-        min(float(inputs.get("sleep_hours", 0)) * 10 / 10, 10),
+        min(float(inputs.get("study_hours", 0)) * 10 / 12, 10),
+        min(float(inputs.get("sleep_hours", 0)) * 10 / 12, 10),
         min(float(inputs.get("physical_hours", 0)) * 10 / 13, 10),
         min(float(inputs.get("social_hours", 0)) * 10 / 6, 10),
         min(float(inputs.get("eca_hours", 0)) * 10 / 4, 10),
