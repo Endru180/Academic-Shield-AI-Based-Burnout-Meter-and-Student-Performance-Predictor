@@ -11,7 +11,6 @@ from src.ui import (
 
 st.set_page_config(
     page_title="Academic Shield",
-    page_icon="🛡️",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
