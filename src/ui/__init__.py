@@ -10,6 +10,7 @@ from src.ui.components import (
     render_probability_bars,
     render_insight_card_animated,
     render_divider,
+    render_hamburger_menu,
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "render_probability_bars",
     "render_insight_card_animated",
     "render_divider",
+    "render_hamburger_menu",
 ]

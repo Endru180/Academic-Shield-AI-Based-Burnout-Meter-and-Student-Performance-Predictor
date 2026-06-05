@@ -86,13 +86,27 @@ def predict_gpa(inputs: dict, models: dict) -> dict:
     """
     stress_val = models["stress_encoder_b"][inputs["stress_level_category"]]
 
+    # Clamp out-of-range inputs to training mean (silent fallback)
+    B_RANGES = {
+        "study_hours":   (5.0, 10.0, 7.48),
+        "sleep_hours":   (5.0, 10.0, 7.50),
+        "eca_hours":     (0.0,  4.0, 1.99),
+        "social_hours":  (0.0,  6.0, 2.70),
+        "physical_hours":(0.0, 13.0, 4.33),
+    }
+
+    def clamp(key):
+        lo, hi, mean = B_RANGES[key]
+        val = inputs[key]
+        return mean if (val < lo or val > hi) else val
+
     row = {
-        "study_hours": inputs["study_hours"],
-        "eca_hours": inputs["eca_hours"],
-        "sleep_hours": inputs["sleep_hours"],
-        "social_hours": inputs["social_hours"],
-        "physical_hours": inputs["physical_hours"],
-        "stress_level": stress_val,
+        "study_hours":    clamp("study_hours"),
+        "eca_hours":      clamp("eca_hours"),
+        "sleep_hours":    clamp("sleep_hours"),
+        "social_hours":   clamp("social_hours"),
+        "physical_hours": clamp("physical_hours"),
+        "stress_level":   stress_val,
     }
     df = pd.DataFrame([row], columns=MODEL_B_BASE_FEATURES)
 

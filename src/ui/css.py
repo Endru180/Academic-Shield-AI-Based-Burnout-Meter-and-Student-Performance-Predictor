@@ -30,6 +30,12 @@ def inject_css():
         [data-testid="stExpandSidebarButton"] { display: none !important; }
         section[data-testid="stSidebarContent"] { display: none !important; }
 
+        /* Give the main container more breathing room */
+        [data-testid="stMainBlockContainer"] {
+            padding-top: 5rem !important;
+            padding-bottom: 6rem !important;
+        }
+
         /* ── Animations ── */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(16px); }
@@ -57,13 +63,14 @@ def inject_css():
 
         /* ── Serif display headings ── */
         .display-title {
-            font-family: 'Instrument Serif', Georgia, serif !important;
-            font-size: 2.6rem;
-            font-weight: 400;
+            font-family: 'Newsreader', Georgia, serif !important;
+            font-size: 2.8rem;
+            font-weight: 600;
             color: #2D2D2D;
             text-align: center;
-            line-height: 1.15;
-            margin-bottom: 4px;
+            line-height: 1.25;
+            letter-spacing: 0.02rem;
+            margin-bottom: 24px;
             animation: fadeInUp 0.6s ease-out;
         }
 
