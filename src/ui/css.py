@@ -1,6 +1,19 @@
 """CSS injection — Claude-style warm palette."""
 
+import base64
 import streamlit as st
+
+_FAVICON_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 52" fill="none">'
+    '<path d="M22 4L6 12V26C6 36.5 13 45.5 22 48C31 45.5 38 36.5 38 26V12L22 4Z"'
+    ' fill="#D97757" opacity="0.18"/>'
+    '<path d="M22 4L6 12V26C6 36.5 13 45.5 22 48C31 45.5 38 36.5 38 26V12L22 4Z"'
+    ' fill="none" stroke="#D97757" stroke-width="1.8" opacity="0.7"/>'
+    '<path d="M19.5 28.5L16 25L14.5 26.5L19.5 31.5L30 21L28.5 19.5L19.5 28.5Z"'
+    ' fill="#D97757" opacity="0.85"/>'
+    '</svg>'
+)
+_FAVICON_B64 = base64.b64encode(_FAVICON_SVG.encode()).decode()
 
 
 def inject_css():
@@ -29,6 +42,11 @@ def inject_css():
         [data-testid="stSidebarCollapseButton"] { display: none !important; }
         [data-testid="stExpandSidebarButton"] { display: none !important; }
         section[data-testid="stSidebarContent"] { display: none !important; }
+        footer { display: none !important; }
+        #MainMenu { display: none !important; }
+        [data-testid="stToolbar"] { display: none !important; }
+        [data-testid="stToolbarActions"] { display: none !important; }
+        [data-testid="managedAppButtonWrapper"] { display: none !important; }
 
         /* Give the main container more breathing room */
         [data-testid="stMainBlockContainer"] {
@@ -281,5 +299,16 @@ def inject_css():
         }
         </style>
         """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"<script>(function(){{"
+        f"var l=document.querySelector(\"link[rel~='icon']\");"
+        f"if(l)l.remove();"
+        f"var n=document.createElement('link');"
+        f"n.rel='icon';n.type='image/svg+xml';"
+        f"n.href='data:image/svg+xml;base64,{_FAVICON_B64}';"
+        f"document.head.appendChild(n);"
+        f"}})();</script>",
         unsafe_allow_html=True,
     )

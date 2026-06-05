@@ -1,8 +1,6 @@
 import streamlit as st
-import pandas as pd
-import os
 
-from src.config import ALL_INPUT_KEYS, COLORS, INSIGHTS, FEEDBACK_PATH
+from src.config import ALL_INPUT_KEYS, COLORS, INSIGHTS, FEEDBACK_TABLE
 from src.models import load_models, predict_burnout, predict_gpa
 from src.ui import (
     inject_css,
@@ -20,6 +18,7 @@ from src.ui import (
 
 st.set_page_config(
     page_title="Academic Shield",
+    page_icon="🛡️",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
@@ -142,23 +141,27 @@ with st.form("feedback_form"):
             "Submit Feedback", type="primary", use_container_width=True
         )
 
+@st.cache_resource
+def _supabase_client():
+    from supabase import create_client
+    return create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
+
+
 if feedback_submitted:
-    os.makedirs("feedback", exist_ok=True)
-    feedback_data = pd.DataFrame(
-        [
+    try:
+        _supabase_client().table(FEEDBACK_TABLE).insert(
             {
                 **inputs,
-                "burnout_gauge_score": burnout["score"],
+                "burnout_gauge_score": float(burnout["score"]),
                 "burnout_class": burnout["class_name"],
-                "predicted_gpa": gpa["gpa"],
+                "predicted_gpa": float(gpa["gpa"]),
                 "rating": rating.count("⭐"),
                 "comment": comment,
             }
-        ]
-    )
-    file_exists = os.path.exists(FEEDBACK_PATH)
-    feedback_data.to_csv(FEEDBACK_PATH, mode="a", header=not file_exists, index=False)
-    st.success("Thank you for your feedback!")
+        ).execute()
+        st.success("Thank you for your feedback!")
+    except Exception:
+        st.error("Failed to submit feedback. Please try again later.")
 
 # ---------------------------------------------------------------------------
 # Navigation

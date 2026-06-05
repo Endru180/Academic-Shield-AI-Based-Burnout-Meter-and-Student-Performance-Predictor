@@ -94,5 +94,5 @@ INSIGHTS = {
     0: "You're in good shape! Keep maintaining this balanced lifestyle and stay consistent with your habits.",
 }
 
-# Feedback CSV path
-FEEDBACK_PATH = "feedback/responses.csv"
+# Supabase table name for feedback
+FEEDBACK_TABLE = "feedback"
