@@ -4,13 +4,14 @@ import base64
 import streamlit as st
 
 _FAVICON_SVG = (
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 52" fill="none">'
-    '<path d="M22 4L6 12V26C6 36.5 13 45.5 22 48C31 45.5 38 36.5 38 26V12L22 4Z"'
-    ' fill="#D97757" opacity="0.18"/>'
-    '<path d="M22 4L6 12V26C6 36.5 13 45.5 22 48C31 45.5 38 36.5 38 26V12L22 4Z"'
-    ' fill="none" stroke="#D97757" stroke-width="1.8" opacity="0.7"/>'
-    '<path d="M19.5 28.5L16 25L14.5 26.5L19.5 31.5L30 21L28.5 19.5L19.5 28.5Z"'
-    ' fill="#D97757" opacity="0.85"/>'
+    '<svg width="180" height="64" viewBox="0 0 180 64" fill="none" xmlns="http://www.w3.org/2000/svg">'
+    '<path d="M22 4L6 12V26C6 36.5 13 45.5 22 48C31 45.5 38 36.5 38 26V12L22 4Z" fill="#D97757" opacity="0.18"/>'
+    '<path d="M22 4L6 12V26C6 36.5 13 45.5 22 48C31 45.5 38 36.5 38 26V12L22 4Z" fill="none" stroke="#D97757" stroke-width="1.8" opacity="0.7"/>'
+    '<path d="M22 8L10 15V26C10 34 16 41.5 22 44C28 41.5 34 34 34 26V15L22 8Z" fill="none" stroke="#D97757" stroke-width="0.8" opacity="0.25"/>'
+    '<path d="M19.5 28.5L16 25L14.5 26.5L19.5 31.5L30 21L28.5 19.5L19.5 28.5Z" fill="#D97757" opacity="0.85"/>'
+    '<text x="46" y="24" font-family="\'Newsreader\', Georgia, serif" font-size="14" font-weight="600" fill="#2D2D2D" letter-spacing="0.5">Academic</text>'
+    '<text x="46" y="42" font-family="\'Newsreader\', Georgia, serif" font-size="14" font-weight="400" fill="#D97757" letter-spacing="1">Shield</text>'
+    '<line x1="46" y1="47" x2="148" y2="47" stroke="#D97757" stroke-width="1" opacity="0.25"/>'
     '</svg>'
 )
 _FAVICON_B64 = base64.b64encode(_FAVICON_SVG.encode()).decode()
