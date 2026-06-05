@@ -159,8 +159,8 @@ if feedback_submitted:
             }
         ).execute()
         st.success("Thank you for your feedback!")
-    except Exception:
-        st.error("Failed to submit feedback. Please try again later.")
+    except Exception as e:
+        st.error(f"Failed to submit feedback: {type(e).__name__} — {e}")
 
 # ---------------------------------------------------------------------------
 # Navigation

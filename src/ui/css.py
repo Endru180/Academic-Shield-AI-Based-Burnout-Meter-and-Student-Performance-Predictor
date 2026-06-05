@@ -43,11 +43,6 @@ def inject_css():
         [data-testid="stSidebarCollapseButton"] { display: none !important; }
         [data-testid="stExpandSidebarButton"] { display: none !important; }
         section[data-testid="stSidebarContent"] { display: none !important; }
-        footer { display: none !important; }
-        #MainMenu { display: none !important; }
-        [data-testid="stToolbar"] { display: none !important; }
-        [data-testid="stToolbarActions"] { display: none !important; }
-        [data-testid="managedAppButtonWrapper"] { display: none !important; }
 
         /* Give the main container more breathing room */
         [data-testid="stMainBlockContainer"] {
