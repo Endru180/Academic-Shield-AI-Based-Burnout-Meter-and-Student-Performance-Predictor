@@ -216,4 +216,8 @@ feedback/*.csv
 
 # CatBoost training logs
 catboost_info/
-
+datasets/
+mlruns/
+artifacts.zip
+mlflow.db
+MLflow.ipynb
