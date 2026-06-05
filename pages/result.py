@@ -6,6 +6,7 @@ from src.config import ALL_INPUT_KEYS, COLORS, INSIGHTS, FEEDBACK_PATH
 from src.models import load_models, predict_burnout, predict_gpa
 from src.ui import (
     inject_css,
+    fix_page_title,
     render_animated_header,
     build_burnout_gauge,
     render_gpa_ring,
@@ -18,11 +19,12 @@ from src.ui import (
 )
 
 st.set_page_config(
-    page_title="Academic Shield — Results",
+    page_title="Academic Shield",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
 inject_css()
+fix_page_title()
 render_neural_background()
 render_hamburger_menu()
 

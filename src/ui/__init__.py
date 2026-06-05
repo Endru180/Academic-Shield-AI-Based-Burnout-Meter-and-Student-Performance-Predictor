@@ -11,6 +11,7 @@ from src.ui.components import (
     render_insight_card_animated,
     render_divider,
     render_hamburger_menu,
+    fix_page_title,
 )
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "render_insight_card_animated",
     "render_divider",
     "render_hamburger_menu",
+    "fix_page_title",
 ]

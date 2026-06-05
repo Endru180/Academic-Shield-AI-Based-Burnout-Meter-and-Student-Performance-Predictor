@@ -169,6 +169,30 @@ def render_divider():
     st.markdown('<div class="warm-divider"></div>', unsafe_allow_html=True)
 
 
+def fix_page_title(title: str = "Academic Shield"):
+    import streamlit.components.v1 as components
+
+    components.html(
+        f"""
+<script>
+(function() {{
+    var t = {json.dumps(title)};
+    var pd = window.parent.document;
+    function enforce() {{ if (pd.title !== t) pd.title = t; }}
+    enforce();
+    var el = pd.querySelector('title');
+    if (el) {{
+        var obs = new MutationObserver(enforce);
+        obs.observe(el, {{ childList: true, subtree: true, characterData: true }});
+    }}
+}})();
+</script>
+""",
+        height=0,
+        scrolling=False,
+    )
+
+
 def render_hamburger_menu():
     import streamlit.components.v1 as components
     components.html(
