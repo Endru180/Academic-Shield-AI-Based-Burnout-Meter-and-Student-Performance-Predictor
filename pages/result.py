@@ -144,7 +144,7 @@ with st.form("feedback_form"):
 @st.cache_resource
 def _supabase_client():
     from supabase import create_client
-    return create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
+    return create_client(st.secrets["https://bxxrrggtsitkzjauoior.supabase.co"], st.secrets["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4eHJyZ2d0c2l0a3pqYXVvaW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NTg2NDIsImV4cCI6MjA5NjIzNDY0Mn0.VSy1HIkDrorxh0G6J33giA1M-n5AoEpekMmKJRv2N0g"])
 
 
 if feedback_submitted:
