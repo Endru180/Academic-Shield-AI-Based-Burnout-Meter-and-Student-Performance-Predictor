@@ -19,6 +19,7 @@ from src.ui import (
 st.set_page_config(
     page_title="Academic Shield",
     layout="centered",
+    page_icon="🛡️",
     initial_sidebar_state="collapsed",
 )
 inject_css()
