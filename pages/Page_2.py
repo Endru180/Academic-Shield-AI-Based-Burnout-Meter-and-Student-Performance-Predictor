@@ -6,6 +6,7 @@ from src.ui import inject_css, fix_page_title, render_animated_header, render_pr
 st.set_page_config(
     page_title="Academic Shield",
     layout="centered",
+    page_icon="🛡️",
     initial_sidebar_state="collapsed",
 )
 inject_css()
