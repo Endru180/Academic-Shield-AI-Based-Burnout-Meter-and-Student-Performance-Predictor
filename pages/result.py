@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.config import ALL_INPUT_KEYS, COLORS, INSIGHTS, FEEDBACK_TABLE
+from src.config import ALL_INPUT_KEYS, COLORS, INSIGHTS, FEEDBACK_TABLE, GPA_INPUT_LABELS
 from src.models import load_models, predict_burnout, predict_gpa
 from src.ui import (
     inject_css,
@@ -69,6 +69,12 @@ render_divider()
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     render_gpa_ring(gpa["gpa"], gpa["label"])
+    if gpa["out_of_range"]:
+        labels = ", ".join(GPA_INPUT_LABELS.get(k, k) for k in gpa["out_of_range"])
+        st.caption(
+            f"ℹ️ Your {labels} fall outside the range this GPA model was "
+            "trained on, so typical averages were used for those inputs instead."
+        )
 
 render_divider()
 
@@ -165,7 +171,8 @@ if feedback_submitted:
         ).execute()
         st.success("Thank you for your feedback!")
     except Exception as e:
-        st.error(f"Failed to submit feedback: {type(e).__name__} — {e}")
+        print(f"[feedback] submission failed: {type(e).__name__} — {e}")
+        st.error("Sorry, we couldn't submit your feedback right now. Please try again later.")
 
 # ---------------------------------------------------------------------------
 # Navigation

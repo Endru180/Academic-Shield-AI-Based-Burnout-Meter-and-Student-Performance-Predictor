@@ -25,7 +25,6 @@ def load_models():
             "model_a": joblib.load("models/modelA.pkl"),
             "model_b": joblib.load("models/modelB.pkl"),
             "pipeline_a": joblib.load("models/pipeline_a.pkl"),
-            "burnout_class_map": joblib.load("models/burnout_class_mapping.pkl"),
             "stress_encoder_b": joblib.load("models/stress_level_encoder_modelB.pkl"),
         }
     except Exception as e:
@@ -82,11 +81,15 @@ def predict_gpa(inputs: dict, models: dict) -> dict:
 
     Returns
     -------
-    dict with keys: gpa, label
+    dict with keys: gpa, label, out_of_range
+        out_of_range lists the input keys that fell outside the range Model B
+        was trained on and were therefore substituted with the training mean
+        (so the caller can surface this to the user instead of staying silent).
     """
     stress_val = models["stress_encoder_b"][inputs["stress_level_category"]]
 
-    # Clamp out-of-range inputs to training mean (silent fallback)
+    # Inputs outside the trained range are replaced with the training mean to
+    # avoid extrapolation — recorded in `out_of_range` so the UI can disclose it.
     B_RANGES = {
         "study_hours":   (5.0, 10.0, 7.48),
         "sleep_hours":   (5.0, 10.0, 7.50),
@@ -95,10 +98,15 @@ def predict_gpa(inputs: dict, models: dict) -> dict:
         "physical_hours":(0.0, 13.0, 4.33),
     }
 
+    out_of_range = []
+
     def clamp(key):
         lo, hi, mean = B_RANGES[key]
         val = inputs[key]
-        return mean if (val < lo or val > hi) else val
+        if val < lo or val > hi:
+            out_of_range.append(key)
+            return mean
+        return val
 
     row = {
         "study_hours":    clamp("study_hours"),
@@ -119,4 +127,4 @@ def predict_gpa(inputs: dict, models: dict) -> dict:
             label = lbl
             break
 
-    return {"gpa": gpa, "label": label}
+    return {"gpa": gpa, "label": label, "out_of_range": out_of_range}

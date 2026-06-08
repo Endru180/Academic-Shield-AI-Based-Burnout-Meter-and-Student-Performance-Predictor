@@ -130,12 +130,15 @@ def render_radar_chart(inputs: dict):
         "Stress", "Exam Pressure", "Family Expect.", "Finance",
         "Social Support", "Anxiety", "Depression",
     ]
+    # Divisors mirror each slider's max value on Page 1 (study/sleep: 12,
+    # exercise/ECA: 6, social: 9) so the radar spans the full 0-10 scale
+    # proportionally to what the user can actually input.
     values = [
         min(float(inputs.get("study_hours", 0)) * 10 / 12, 10),
         min(float(inputs.get("sleep_hours", 0)) * 10 / 12, 10),
-        min(float(inputs.get("physical_hours", 0)) * 10 / 13, 10),
-        min(float(inputs.get("social_hours", 0)) * 10 / 6, 10),
-        min(float(inputs.get("eca_hours", 0)) * 10 / 4, 10),
+        min(float(inputs.get("physical_hours", 0)) * 10 / 6, 10),
+        min(float(inputs.get("social_hours", 0)) * 10 / 9, 10),
+        min(float(inputs.get("eca_hours", 0)) * 10 / 6, 10),
         stress_map.get(inputs.get("stress_level_category", "Moderate"), 5.0),
         float(inputs.get("exam_pressure", 0)),
         float(inputs.get("family_expectation", 0)),

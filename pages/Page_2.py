@@ -38,13 +38,17 @@ def get_rating(key, default):
     val = st.session_state.get(key, default)
     return val if val in RATING_OPTIONS else default
 
+STRESS_OPTIONS = ["Low", "Moderate", "High"]
+
+def get_stress_default():
+    val = st.session_state.get("stress_level_category", "Moderate")
+    return val if val in STRESS_OPTIONS else "Moderate"
+
 with st.form("page2_form"):
     stress_level_category = st.selectbox(
         "How is your stress condition recently?",
-        options=["Low", "Moderate", "High"],
-        index=["Low", "Moderate", "High"].index(
-            st.session_state.get("stress_level_category", "Moderate")
-        ),
+        options=STRESS_OPTIONS,
+        index=STRESS_OPTIONS.index(get_stress_default()),
         help="Low = rarely stressed, Moderate = sometimes stressed, High = frequently stressed.",
     )
 

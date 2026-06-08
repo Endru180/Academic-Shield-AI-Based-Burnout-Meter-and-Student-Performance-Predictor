@@ -50,6 +50,17 @@ GPA_LABELS = [
     (0.0, "Needs improvement."),
 ]
 
+# Friendly labels for GPA-model inputs — used to disclose when an input fell
+# outside Model B's trained range and was substituted with the training mean
+# (see predict_gpa's `out_of_range` in src/models.py)
+GPA_INPUT_LABELS = {
+    "study_hours": "study hours",
+    "sleep_hours": "sleep hours",
+    "eca_hours": "extracurricular hours",
+    "social_hours": "social hours",
+    "physical_hours": "exercise hours",
+}
+
 # ---------------------------------------------------------------------------
 # UI — Claude-style warm palette
 # ---------------------------------------------------------------------------
