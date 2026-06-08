@@ -34,7 +34,7 @@ Academic Shield is a **Streamlit** web app that estimates a student's **burnout 
 | Reported performance | Test Macro-F1 ≈ 0.57, 5-fold CV Macro-F1 ≈ 0.54, CV Accuracy ≈ 0.92 (dummy baseline ≈ 0.31 F1 / 0.89 acc) | Test R² ≈ 0.53, RMSE ≈ 0.20, NRMSE ≈ 12% |
 | Stress encoding | `STRESS_MAPPING_A = {"Low": 2.29, "Moderate": 4.80, "High": 7.42}` (means learned from the training data) | `{"Low": 0, "Moderate": 1, "High": 2}` via `models/stress_level_encoder_modelB.pkl` |
 
-Training notebooks live in `notebooks/` (`modelA.ipynb`, `modelB.ipynb`); `v2_improvement/` contains exploratory work (EDA + an experimental Model B v2 with feature engineering) that is **not** wired into the deployed app. `MLflow.ipynb` re-runs both training pipelines through MLflow for experiment tracking (see note below).
+Training notebooks live in `notebooks/` (`modelA.ipynb`, `modelB.ipynb`); `v2_improvement/` contains exploratory work (EDA + an experimental Model B v2 with feature engineering) that is **not** wired into the deployed app.
 
 ### Burnout gauge score
 
@@ -69,7 +69,6 @@ The weights were chosen so a confident prediction for each class lands inside it
 │   └── stress_level_encoder_modelB.pkl
 ├── notebooks/                 # Model training notebooks (source of truth for models/)
 ├── v2_improvement/            # Exploratory EDA & experimental Model B v2 (not deployed)
-├── MLflow.ipynb               # MLflow experiment-tracking pipeline (assignment artifact)
 ├── performance_test.py        # Standalone load/latency test for the deployed app
 ├── feedback/, .streamlit/     # Misc. asset/config folders
 ├── requirements.txt
@@ -120,7 +119,7 @@ Checks connectivity, latency distribution, concurrent/sustained load, and local 
 1. **`Page_1.py`** collects the 5 lifestyle sliders into `st.session_state` (keys listed in `PAGE1_KEYS`) and routes to `pages/Page_2.py`.
 2. **`pages/Page_2.py`** validates that step 1 was completed, collects the stress/mental-health ratings, converts each `"Very Low"…"Very High"` rating to a `0.0–10.0` score via `RATING_TO_SCORE`, stores everything in session state (`ALL_INPUT_KEYS`), and routes to `pages/result.py`.
 3. **`pages/result.py`**:
-   - Loads all 5 model artifacts once via `@st.cache_resource` (`src/models.py::load_models`).
+   - Loads all 4 model artifacts once via `@st.cache_resource` (`src/models.py::load_models`).
    - Calls `predict_burnout()` — maps the categorical stress level through `STRESS_MAPPING_A`, builds a 10-feature row, runs it through the cloudpickled `pipeline_a` (feature engineering) and then `model_a` (XGBoost) to get a class + probabilities + gauge score.
    - Calls `predict_gpa()` — maps stress through `stress_encoder_b`, clamps each lifestyle value to the ranges Model B was trained on (substituting the training mean for out-of-range inputs — see ⚠️ note below), and runs `model_b` (GradientBoosting) to get a GPA.
    - Renders the gauge, GPA ring, radar chart, probability bars, and an animated insight text (`INSIGHTS` in `config.py`, keyed by burnout class).
@@ -130,8 +129,7 @@ Checks connectivity, latency distribution, concurrent/sustained load, and local 
 
 ## ⚠️ Known quirks & limitations (read before relying on the numbers)
 
-- **GPA-input clamping vs. slider ranges.** Model B was trained on a narrower range of habits than the sliders allow (e.g. `study_hours` trained range is `[5, 10]` but the slider goes `0–12`). Inputs outside the trained range are **silently replaced by the training-set mean** before being sent to Model B (`B_RANGES` in `src/models.py`). This avoids extrapolation errors, but it does mean the predicted GPA can reflect different numbers than what you entered and the radar chart displays — there is currently no UI indication when this substitution happens.
-- **Radar chart scaling.** A few axes (`Exercise`, `ECA`, `Social Life`) are normalized against ranges that don't match the corresponding sliders' max values, so the chart can compress or saturate those axes rather than spanning the full 0–10 scale proportionally to what you can actually input.
+- **GPA-input clamping vs. slider ranges.** Model B was trained on a narrower range of habits than the sliders allow (e.g. `study_hours` trained range is `[5, 10]` but the slider goes `0–12`). Inputs outside the trained range are replaced by the training-set mean before being sent to Model B (`B_RANGES` in `predict_gpa`, `src/models.py`) — this avoids extrapolation errors, but it does mean the predicted GPA can reflect different numbers than what you entered and the radar chart displays. The result page discloses this: `predict_gpa` returns the affected input keys as `out_of_range`, and `pages/result.py` renders a caption naming them (friendly labels from `GPA_INPUT_LABELS` in `src/config.py`) whenever a substitution happens.
 - **Class imbalance.** The burnout dataset is heavily skewed toward "Healthy" (~89%); SMOTE is used during training to mitigate this, and Macro-F1 (rather than accuracy) is the primary evaluation metric.
 - **Small GPA dataset.** Model B is trained on only ~2,000 rows and explains roughly half of GPA variance (R² ≈ 0.53) — treat its output as a rough estimate, not a precise forecast.
 - **Privacy.** Per the in-app privacy notice, your habit/stress inputs are used only for prediction; only the optional feedback (rating + comment + prediction summary) is persisted, and only if you explicitly submit it.
@@ -142,7 +140,6 @@ Checks connectivity, latency distribution, concurrent/sustained load, and local 
 
 - **App / UI:** Streamlit, custom CSS/HTML/JS injection, Plotly
 - **ML:** scikit-learn, XGBoost, joblib/cloudpickle
-- **Data tracking:** MLflow (see `MLflow.ipynb`)
 - **Storage:** Supabase (feedback only)
 - **Testing:** a custom `requests`-based performance/load test script
 
